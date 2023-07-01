@@ -16,12 +16,25 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun currentStateJson(state: S, error: String?): String
 
+    private val messages: MutableList<ChatGptMessage> = mutableListOf()
+    private var prePrompted = false
+
     suspend fun prompt(
         state: S,
         error: String?,
         maxSteps: Int,
         availableTransition: List<Trans>
     ): Pair<Trans, InputMap> {
+        if (!prePrompted) {
+            messages.add(
+                ChatGptMessage(
+                    role = ChatGptRole.System.stringValue,
+                    content = prePrompt(state.data, maxSteps)
+                )
+            )
+            prePrompted = true
+        }
+
         val prompt = buildString {
             val currentStateJson = currentStateJson(state, error)
             append(
@@ -34,6 +47,12 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
             """.trimIndent()
             )
         }
+        messages.add(
+            ChatGptMessage(
+                role = ChatGptRole.User.stringValue,
+                content = prompt,
+            )
+        )
 
         val responseJson = chatGptService.prompt(
             conversation = listOf(
@@ -49,14 +68,9 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         )
 
         val response = Json.decodeFromString<ChatGTPResponse>(responseJson)
-        val optionIndex = 'A'.code - response.option.first().code
-        return availableTransition[optionIndex] to response.input
+        val optionIndex = response.option.first().code - 'A'.code
+        return availableTransition[optionIndex] to (response.input ?: emptyMap())
     }
-
-    private fun String.formatJson(): String {
-        return this.replace(Regex("[^a-zA-Z0-9{}:\".,\\[\\]-_ ]"), "").replace("\n", "")
-    }
-
 
     private fun List<Trans>.toOptionsMenu(): String {
         var letter = 'A'
@@ -123,7 +137,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     @Serializable
     data class ChatGTPResponse(
         val option: String,
-        val input: Map<String, String>
+        val input: Map<String, String>? = null
     )
 }
 

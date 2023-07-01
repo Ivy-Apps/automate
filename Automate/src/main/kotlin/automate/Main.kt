@@ -1,6 +1,6 @@
 package automate
 
-import automate.demo.article.ArticlePrinter
+import automate.demo.article.ArticleProducer
 import automate.demo.article.statemachine.ArticleStateMachine
 import automate.di.DaggerAppComponent
 import io.github.oshai.kotlinlogging.KLogger
@@ -9,9 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
-val logger: KLogger = KotlinLogging.logger {
-
-}
+val logger: KLogger = KotlinLogging.logger {}
 
 suspend fun main(args: Array<String>) {
     val appComponent = DaggerAppComponent.create()
@@ -21,7 +19,7 @@ suspend fun main(args: Array<String>) {
 
 class AutomateApp @Inject constructor(
     private val articleStateMachine: ArticleStateMachine,
-    private val articlePrinter: ArticlePrinter
+    private val articleProducer: ArticleProducer
 ) {
     private val scope = CoroutineScope(CoroutineName("AutomateApp"))
 
@@ -32,16 +30,21 @@ class AutomateApp @Inject constructor(
             withContext(Dispatchers.IO) {
                 articleStateMachine.state.collectLatest { state ->
                     println("Iteration #${++iteration}: -----------------------")
-                    println(articlePrinter.asString(state.data))
+                    println(articleProducer.toMarkdown(state.data))
                     println("---------------------------------------------------")
                 }
             }
         }
-        articleStateMachine.run()
-        println("Result: ---------------------")
-        val article = articleStateMachine.state.value.data
-        val articleString = articlePrinter.asString(article)
-        println(articleString)
-        println("--------------------------")
+        try {
+            articleStateMachine.run()
+            println("Result: ---------------------")
+            val article = articleStateMachine.state.value.data
+            println(articleProducer.toMarkdown(article))
+            println("--------------------------")
+            articleProducer.saveInFile(article)
+        } catch (e: Exception) {
+            articleProducer.saveInFile(articleStateMachine.state.value.data)
+            throw e
+        }
     }
 }

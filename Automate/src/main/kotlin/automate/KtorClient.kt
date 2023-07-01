@@ -4,6 +4,7 @@ import automate.di.AppScope
 import automate.di.SingleIn
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
@@ -23,7 +24,9 @@ class KtorClient @Inject constructor() {
                 })
             }
 
-//            install(Logging)
+            install(Logging) {
+                level = LogLevel.BODY
+            }
         }.also {
             logger.debug("KtorClient initialized.")
         }
