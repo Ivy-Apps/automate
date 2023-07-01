@@ -1,7 +1,8 @@
-package automate.demo.article
+package automate.demo.article.statemachine
 
-import arrow.core.Either
-import automate.statemachine.*
+import automate.demo.article.Article
+import automate.statemachine.InputMap
+import automate.statemachine.StateMachine
 
 
 class ArticleStateMachine : StateMachine<ArticleState, ArticleTransition, Article>(

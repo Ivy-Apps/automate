@@ -1,43 +1,51 @@
 package automate.statemachine
 
 import arrow.core.Either
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @DslMarker
 annotation class StateMachineDsl
 
-abstract class StateMachine<S : State<A>, Trn : Transition<S, A>, A>(
+abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     initialState: S,
     private val maxErrors: Int = 3,
     private val maxSteps: Int = Int.MAX_VALUE
 ) {
-    var state: S = initialState
-        private set
+    private val internalState = MutableStateFlow(initialState)
+    val state: StateFlow<S> = internalState
 
     private var steps = 0
     private var errors = 0
     private var error: String? = null
 
-    abstract fun availableTransitions(state: S): List<Trn>
+    abstract fun availableTransitions(state: S): List<Trans>
 
     abstract suspend fun nextTransition(
-        availableTransitions: List<Trn>,
+        availableTransitions: List<Trans>,
         error: String?,
-    ): Pair<Trn, InputMap>
+    ): Pair<Trans, InputMap>
+
+    open suspend fun onFinished(state: S, error: String?) {}
 
     tailrec suspend fun run() {
         if (++steps >= maxSteps) {
             error = "Max steps reached! Reached $steps."
+            onFinished(state.value, error)
             return
         }
-        if (state.isFinal) return
+        if (state.value.isFinal) {
+            onFinished(state.value, error)
+            return
+        }
 
         val (transition, input) = nextTransition(
-            availableTransitions = availableTransitions(state),
+            availableTransitions = availableTransitions(state.value),
             error = error,
         )
         when (
             val res = transition.transition(
-                state = state,
+                state = state.value,
                 input = input
             )
         ) {
@@ -45,12 +53,15 @@ abstract class StateMachine<S : State<A>, Trn : Transition<S, A>, A>(
                 error = res.value
                 if (++errors < maxErrors) {
                     run()
+                } else {
+                    onFinished(state.value, error)
+                    return
                 }
             }
 
             is Either.Right -> {
                 error = null
-                state = res.value
+                internalState.value = res.value
                 run()
             }
         }

@@ -1,7 +1,9 @@
-package automate.demo.article
+package automate.demo.article.statemachine
 
 import arrow.core.Either
 import arrow.core.raise.either
+import automate.demo.article.Article
+import automate.demo.article.BodyItem
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
@@ -9,6 +11,8 @@ import automate.statemachine.TransitionParam
 sealed class ArticleTransition : Transition<ArticleState, Article>()
 
 object SetTitleTransition : ArticleTransition() {
+    override val name = "Set the article title"
+
     private val PARAM_TITLE = TransitionParam(name = "articleTitle", type = String::class)
 
     override val input = listOf(PARAM_TITLE)
@@ -25,8 +29,14 @@ object SetTitleTransition : ArticleTransition() {
 }
 
 object AddSectionTransition : ArticleTransition() {
+    override val name: String = "Add a paragraph section"
+
     private val PARAM_TITLE = TransitionParam(name = "sectionTitle", type = String::class)
-    private val PARAM_TEXT = TransitionParam(name = "sectionText", type = String::class)
+    private val PARAM_TEXT = TransitionParam(
+        name = "sectionText",
+        type = String::class,
+        description = "Supports Markdown"
+    )
 
     override val input = listOf(PARAM_TITLE, PARAM_TEXT)
 
@@ -47,9 +57,12 @@ object AddSectionTransition : ArticleTransition() {
 }
 
 object AddImageTransition : ArticleTransition() {
+    override val name: String = "Add an image"
+
     private val PARAM_IMAGE_PROMPT = TransitionParam(
-        name = "DALL-E image prompt",
+        name = "dallEPrompt",
         type = String::class,
+        description = "A prompt that Dall-E will use to generate an image"
     )
 
     override val input = listOf(PARAM_IMAGE_PROMPT)
@@ -69,6 +82,8 @@ object AddImageTransition : ArticleTransition() {
 }
 
 object FinalizeTransition : ArticleTransition() {
+    override val name: String = "Finalize the article"
+
     override val input: List<TransitionParam<*>> = emptyList()
 
     override fun transition(state: ArticleState, input: InputMap): Either<String, ArticleState> {

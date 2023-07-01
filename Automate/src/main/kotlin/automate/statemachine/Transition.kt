@@ -8,6 +8,9 @@ import kotlin.reflect.KClass
 typealias InputMap = Map<String, Any>
 
 abstract class Transition<S : State<A>, A> {
+    abstract val name: String
+    open val description: String? = null
+
     abstract val input: List<TransitionParam<*>>
     abstract fun transition(state: S, input: InputMap): Either<String, S>
 
@@ -30,4 +33,5 @@ abstract class Transition<S : State<A>, A> {
 data class TransitionParam<T : Any>(
     val name: String,
     val type: KClass<T>,
+    val description: String? = null,
 )

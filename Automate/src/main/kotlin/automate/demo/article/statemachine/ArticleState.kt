@@ -1,10 +1,12 @@
-package automate.demo.article
+package automate.demo.article.statemachine
 
+import automate.demo.article.Article
 import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
     object Initial : ArticleState {
         override val data = Article(
+            topic = "State Machines using Kotlin and functional programming",
             title = "",
             body = emptyList()
         )
