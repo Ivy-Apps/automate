@@ -14,6 +14,7 @@ import javax.inject.Inject
 class KtorClient @Inject constructor() {
     private val client by lazy {
         logger.debug("Initializing KtorClient...")
+
         HttpClient {
             install(ContentNegotiation) {
                 json(Json {
