@@ -1,24 +1,28 @@
 package automate.demo.article.statemachine
 
 import automate.demo.article.Article
+import automate.demo.article.ai.ArticleChatGptPrompter
 import automate.statemachine.InputMap
 import automate.statemachine.StateMachine
+import javax.inject.Inject
 
-
-class ArticleStateMachine : StateMachine<ArticleState, ArticleTransition, Article>(
-    initialState = ArticleState.Initial
+class ArticleStateMachine @Inject constructor(
+    private val articleChatGptPrompter: ArticleChatGptPrompter,
+) : StateMachine<ArticleState, ArticleTransition, Article>(
+    initialState = ArticleState.Initial,
+    maxSteps = 10,
 ) {
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
         return when (state) {
             ArticleState.Initial -> listOf(
-                AddSectionTransition,
-                AddImageTransition,
+                SetTitleTransition,
             )
 
             is ArticleState.AddedImage -> listOf(AddSectionTransition)
             is ArticleState.Writing -> listOf(
                 AddSectionTransition,
-                AddImageTransition
+                AddImageTransition,
+                FinalizeTransition
             )
 
             is ArticleState.Finished -> listOf()
@@ -26,10 +30,16 @@ class ArticleStateMachine : StateMachine<ArticleState, ArticleTransition, Articl
     }
 
     override suspend fun nextTransition(
+        state: ArticleState,
         availableTransitions: List<ArticleTransition>,
         error: String?
     ): Pair<ArticleTransition, InputMap> {
-        TODO("Not yet implemented")
+        return articleChatGptPrompter.prompt(
+            state = state,
+            error = error,
+            maxSteps = maxSteps,
+            availableTransition = availableTransitions,
+        )
     }
 
 }

@@ -9,8 +9,8 @@ annotation class StateMachineDsl
 
 abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     initialState: S,
-    private val maxErrors: Int = 3,
-    private val maxSteps: Int = Int.MAX_VALUE
+    val maxErrors: Int = 3,
+    val maxSteps: Int = 100
 ) {
     private val internalState = MutableStateFlow(initialState)
     val state: StateFlow<S> = internalState
@@ -22,6 +22,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     abstract fun availableTransitions(state: S): List<Trans>
 
     abstract suspend fun nextTransition(
+        state: S,
         availableTransitions: List<Trans>,
         error: String?,
     ): Pair<Trans, InputMap>
@@ -40,6 +41,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
         }
 
         val (transition, input) = nextTransition(
+            state = state.value,
             availableTransitions = availableTransitions(state.value),
             error = error,
         )

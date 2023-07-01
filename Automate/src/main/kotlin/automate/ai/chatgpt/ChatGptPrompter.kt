@@ -1,43 +1,60 @@
 package automate.ai.chatgpt
 
+import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
+import kotlinx.serialization.json.Json
 
-abstract class ChatGptPrompter<A, S : State<A>, Trans : Transition<S, A>> {
+abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>> {
     protected abstract fun goal(data: A): String
 
-    protected abstract fun stateToJson(state: S): String
+    protected abstract fun currentStateJson(state: S, error: String?): String
 
     private var prePrompted = false
 
     suspend fun prompt(
         state: S,
+        error: String?,
         maxSteps: Int,
         availableTransition: List<Trans>
-    ): Trans {
+    ): Pair<Trans, InputMap> {
         val prompt = buildString {
             if (!prePrompted) {
                 append(prePrompt(state.data, maxSteps))
                 prePrompted = true
             }
+
+            val currentStateJson = currentStateJson(state, error)
             append(
                 """
                 Current state:
-                ${stateToJson(state)}
+                $currentStateJson
                 
                 Choose an option:
                 ${availableTransition.toOptionsMenu()}
             """.trimIndent()
             )
         }
-        println("PROMPT:")
+        println("PROMPT: -----------------")
         println(prompt)
         println("END PROMPT ---------------")
 
         println("Enter the ChatGPT response JSON:")
         val responseJson = readln()
-        TODO("Not yet implemented")
+            .trim()
+            .replace("\t", "")
+            .replace("\n", "")
+            .formatJson()
+
+        val response = Json.decodeFromString<ChatGTPResponse>(responseJson)
+        val optionIndex = 'A'.code - response.option.first().code
+        return availableTransition[optionIndex] to response.input
     }
+
+    private fun String.formatJson(): String {
+        return this.replace(Regex("[^a-zA-Z0-9{}:\".,\\[\\]-_ ]"), "").replace("\n", "")
+    }
+
 
     private fun List<Trans>.toOptionsMenu(): String {
         var letter = 'A'
@@ -48,7 +65,7 @@ abstract class ChatGptPrompter<A, S : State<A>, Trans : Transition<S, A>> {
                 append(transition.name)
                 transition.input.forEach { param ->
                     append("<")
-                    append("${param.name}: ${param.type}")
+                    append("${param.name}: ${param.type.simpleName}")
                     if (param.description != null) {
                         append("; ${param.description}")
                     }
@@ -67,13 +84,15 @@ abstract class ChatGptPrompter<A, S : State<A>, Trans : Transition<S, A>> {
             For example:
             A. Set article title <title: String>
             B. Add section <sectionTitle: String> <sectionText: String; supports Markdown>
-            C. Finalize article [FINAL]
+            C. Finalize article
             
             An example of a valid response if you choose Option B would be:
             {
                 "option": "B",
-                "sectionTitle": "Some section",
-                "sectionText": "Some **text**\n- point 1\n- point 2\nThis is random."
+                "input" : {
+                    "sectionTitle": "Some section",
+                    "sectionText": "Some **text**\n- point 1\n- point 2\nThis is random."
+                }
             }
             
             Then:
@@ -81,8 +100,15 @@ abstract class ChatGptPrompter<A, S : State<A>, Trans : Transition<S, A>> {
             - A JSON representing the current state of your work.
             - A new list of available options and their input parameters.
             
-            You must again respond with a JSON of the option that you think
+            You must again respond only with a JSON of the option that you think
             will move the state closer to achieving the goal.
+            Your response must be in this JSON format:
+            {
+                "option": "C" // the letter of the option
+                "input" : {
+                    // zero or many input parameters
+                }
+            }
             
             ---
             
@@ -94,5 +120,6 @@ abstract class ChatGptPrompter<A, S : State<A>, Trans : Transition<S, A>> {
             ---
             
             
-        """
+        """.trimIndent()
 }
+
