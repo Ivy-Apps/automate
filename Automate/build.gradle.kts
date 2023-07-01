@@ -13,6 +13,23 @@ repositories {
 }
 
 dependencies {
+    // region Arrow KT
+    implementation(platform("io.arrow-kt:arrow-stack:1.2.0-RC"))
+    implementation("io.arrow-kt:arrow-core")
+    implementation("io.arrow-kt:arrow-fx-coroutines")
+    // endregion
+
+    // region Kotest
+    val kotestVersion = "5.6.2"
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation("io.kotest:kotest-property:$kotestVersion")
+    //https://kotest.io/docs/extensions/ktor.html
+    testImplementation("io.kotest.extensions:kotest-assertions-ktor:2.0.0")
+    //https://kotest.io/docs/assertions/arrow.html
+    testImplementation("io.kotest.extensions:kotest-assertions-arrow:1.3.3")
+    // endregion
+
     testImplementation(kotlin("test"))
 }
 
