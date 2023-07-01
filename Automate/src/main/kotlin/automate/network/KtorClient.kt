@@ -1,13 +1,19 @@
-package network
+package automate.network
 
+import automate.di.AppScope
+import automate.di.SingleIn
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import automate.logger
+import javax.inject.Inject
 
-class KtorClient {
+@SingleIn(AppScope::class)
+class KtorClient @Inject constructor() {
     private val client by lazy {
+        logger.debug("Initializing KtorClient...")
         HttpClient {
             install(ContentNegotiation) {
                 json(Json {
@@ -15,6 +21,8 @@ class KtorClient {
                     isLenient = true
                 })
             }
+        }.also {
+            logger.debug("KtorClient initialized.")
         }
     }
 

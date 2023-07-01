@@ -3,6 +3,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.8.21"
     kotlin("plugin.serialization") version "1.8.21"
+    kotlin("kapt") version "1.8.21"
+    //https://github.com/square/anvil
+    id("com.squareup.anvil") version "2.4.6"
+
     application
 }
 
@@ -30,6 +34,16 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // endregion
+
+    // region DI: Dagger + Anvil
+    //https://github.com/google/dagger
+    val daggerVersion = "2.46.1"
+    implementation("com.google.dagger:dagger:$daggerVersion")
+    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
+    // endregion
+
+    //https://github.com/oshai/kotlin-logging
+    implementation("io.github.oshai:kotlin-logging-jvm:4.0.1")
 
     // region Kotest
     val kotestVersion = "5.6.2"
