@@ -9,9 +9,9 @@ class ArticleProducer @Inject constructor() {
         article.body.forEach { item ->
             when (item) {
                 is BodyItem.Image -> {
-                    append("IMAGE[")
+                    append("\n\nIMAGE[")
                     append(item.prompt)
-                    append("]")
+                    append("]\n\n")
                 }
 
                 is BodyItem.Section -> {
@@ -36,7 +36,7 @@ class ArticleProducer @Inject constructor() {
         articleTitle: String,
         content: String
     ) {
-        val pathname = "content/$articleTitle.md"
+        val pathname = "content/$articleTitle (${System.currentTimeMillis()}).md"
         File(pathname).writeText(content)
         println("Article saved in '$pathname'.")
     }
