@@ -8,7 +8,7 @@ import javax.inject.Inject
 class OpenAiSecrets @Inject constructor() {
     val apiKey by lazy {
         requireNotNull(
-            System.getProperty("OPEN_AI_API_KEY")
+            System.getProperty("OPEN_AI_API_KEY", null)
                 .takeIf { it.isNotBlank() }
         ) {
             """

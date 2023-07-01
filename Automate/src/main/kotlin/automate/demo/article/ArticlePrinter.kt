@@ -15,6 +15,7 @@ class ArticlePrinter @Inject constructor() {
 
                 is BodyItem.Section -> {
                     append("## ${item.title}")
+                    append("\n")
                     append(item.text)
                     append("\n\n")
                 }

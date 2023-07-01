@@ -71,7 +71,10 @@ dependencies {
 }
 
 tasks.withType<JavaExec> {
-    systemProperty("OPEN_AI_API_KEY", project.findProperty("ivyapps_openai_api_key") as String? ?: "")
+    systemProperty(
+        "OPEN_AI_API_KEY",
+        project.property("ivyapps_openai_api_key") as String? ?: ""
+    )
 }
 
 tasks.test {
@@ -83,5 +86,5 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("automate.MainKt")
 }
