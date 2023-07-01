@@ -9,7 +9,7 @@ annotation class StateMachineDsl
 
 abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     initialState: S,
-    val maxErrors: Int = 3,
+    val maxErrors: Int = 2,
     val maxSteps: Int = 100
 ) {
     private val internalState = MutableStateFlow(initialState)

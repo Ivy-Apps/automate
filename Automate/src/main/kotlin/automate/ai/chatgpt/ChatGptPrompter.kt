@@ -1,16 +1,20 @@
 package automate.ai.chatgpt
 
+import automate.ai.chatgpt.api.ChatGptMessage
+import automate.ai.chatgpt.api.ChatGptRole
+import automate.ai.chatgpt.api.ChatGptService
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
-abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>> {
+abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
+    private val chatGptService: ChatGptService,
+) {
     protected abstract fun goal(data: A): String
 
     protected abstract fun currentStateJson(state: S, error: String?): String
-
-    private var prePrompted = false
 
     suspend fun prompt(
         state: S,
@@ -19,11 +23,6 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>> 
         availableTransition: List<Trans>
     ): Pair<Trans, InputMap> {
         val prompt = buildString {
-            if (!prePrompted) {
-                append(prePrompt(state.data, maxSteps))
-                prePrompted = true
-            }
-
             val currentStateJson = currentStateJson(state, error)
             append(
                 """
@@ -35,16 +34,19 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>> 
             """.trimIndent()
             )
         }
-        println("PROMPT: -----------------")
-        println(prompt)
-        println("END PROMPT ---------------")
 
-        println("Enter the ChatGPT response JSON:")
-        val responseJson = readln()
-            .trim()
-            .replace("\t", "")
-            .replace("\n", "")
-            .formatJson()
+        val responseJson = chatGptService.prompt(
+            conversation = listOf(
+                ChatGptMessage(
+                    role = ChatGptRole.System.stringValue,
+                    content = prePrompt(state.data, maxSteps)
+                ),
+                ChatGptMessage(
+                    role = ChatGptRole.User.stringValue,
+                    content = prompt,
+                )
+            )
+        )
 
         val response = Json.decodeFromString<ChatGTPResponse>(responseJson)
         val optionIndex = 'A'.code - response.option.first().code
@@ -115,11 +117,13 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>> 
             Here is your goal.
             GOAL: "${goal(data)}".
             You must complete the goal defined above by only responding with a JSON
-            with one of the options that I provide you.
-            
-            ---
-            
-            
+            with one of the options that I provide you.            
         """.trimIndent()
+
+    @Serializable
+    data class ChatGTPResponse(
+        val option: String,
+        val input: Map<String, String>
+    )
 }
 

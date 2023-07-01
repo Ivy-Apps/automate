@@ -70,6 +70,10 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
+tasks.withType<JavaExec> {
+    systemProperty("OPEN_AI_API_KEY", project.findProperty("ivyapps_openai_api_key") as String? ?: "")
+}
+
 tasks.test {
     useJUnitPlatform()
 }

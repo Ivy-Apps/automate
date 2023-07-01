@@ -1,6 +1,7 @@
 package automate.demo.article.ai
 
 import automate.ai.chatgpt.ChatGptPrompter
+import automate.ai.chatgpt.api.ChatGptService
 import automate.demo.article.Article
 import automate.demo.article.statemachine.ArticleState
 import automate.demo.article.statemachine.ArticleTransition
@@ -10,7 +11,8 @@ import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class ArticleChatGptPrompter @Inject constructor(
-) : ChatGptPrompter<Article, ArticleState, ArticleTransition>() {
+    chatGptService: ChatGptService
+) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(chatGptService) {
     override fun goal(data: Article): String {
         return """
             Write a short article on the following topic: "${data.topic}"

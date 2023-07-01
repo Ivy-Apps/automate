@@ -10,6 +10,7 @@ class ArticleStateMachine @Inject constructor(
     private val articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.Initial,
+    maxErrors = 1,
     maxSteps = 10,
 ) {
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {

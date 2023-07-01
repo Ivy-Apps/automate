@@ -1,10 +1,12 @@
 package automate
 
-import automate.demo.article.BodyItem
+import automate.demo.article.ArticlePrinter
 import automate.demo.article.statemachine.ArticleStateMachine
 import automate.di.DaggerAppComponent
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 val logger: KLogger = KotlinLogging.logger {
@@ -18,33 +20,28 @@ suspend fun main(args: Array<String>) {
 }
 
 class AutomateApp @Inject constructor(
-    private val ktorClient: KtorClient,
     private val articleStateMachine: ArticleStateMachine,
+    private val articlePrinter: ArticlePrinter
 ) {
-    suspend fun run() {
-        articleStateMachine.run()
-        println("-----------------")
-        println("Result:")
-        val data = articleStateMachine.state.value.data
-        val article = buildString {
-            append("# ${data.title}")
-            data.body.forEach { item ->
-                when (item) {
-                    is BodyItem.Image -> {
-                        append("IMAGE[")
-                        append(item.prompt)
-                        append("]")
-                    }
+    private val scope = CoroutineScope(CoroutineName("AutomateApp"))
 
-                    is BodyItem.Section -> {
-                        append("## ${item.title}")
-                        append(item.text)
-                        append("\n\n")
-                    }
+    private var iteration = 0
+
+    suspend fun run() {
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                articleStateMachine.state.collectLatest { state ->
+                    println("Iteration #${++iteration}: -----------------------")
+                    println(articlePrinter.asString(state.data))
+                    println("---------------------------------------------------")
                 }
             }
         }
-        println(article)
+        articleStateMachine.run()
+        println("Result: ---------------------")
+        val article = articleStateMachine.state.value.data
+        val articleString = articlePrinter.asString(article)
+        println(articleString)
         println("--------------------------")
     }
 }
