@@ -17,6 +17,8 @@ dependencies {
     implementation(platform("io.arrow-kt:arrow-stack:1.2.0-RC"))
     implementation("io.arrow-kt:arrow-core")
     implementation("io.arrow-kt:arrow-fx-coroutines")
+    // https://mvnrepository.com/artifact/io.arrow-kt/arrow-exact-jvm
+    implementation("io.arrow-kt:arrow-exact-jvm:0.1.0")
     // endregion
 
     // region Kotest
