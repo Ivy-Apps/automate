@@ -24,6 +24,7 @@ class ArticleChatGptPrompter @Inject constructor(
             - Make it engaging.
             - Use Markdown formatting where possible.
             - Keep it short.
+            - You must not repeat yourself.
         """.trimIndent()
     }
 

@@ -30,8 +30,6 @@ class AutomateApp @Inject constructor(
             withContext(Dispatchers.IO) {
                 articleStateMachine.state.collectLatest { state ->
                     println("Iteration #${++iteration}: -----------------------")
-                    println(articleProducer.toMarkdown(state.data))
-                    println("---------------------------------------------------")
                 }
             }
         }

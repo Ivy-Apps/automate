@@ -11,7 +11,7 @@ class ArticleStateMachine @Inject constructor(
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.Initial,
     maxErrors = 1,
-    maxSteps = 30,
+    maxSteps = 15,
 ) {
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
         return when (state) {
