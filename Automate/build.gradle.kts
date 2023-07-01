@@ -33,6 +33,11 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    // region Ktor Logging
+    //https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    implementation("ch.qos.logback:logback-classic:1.2.9")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion")
+    // endregion
     // endregion
 
     // region DI: Dagger + Anvil

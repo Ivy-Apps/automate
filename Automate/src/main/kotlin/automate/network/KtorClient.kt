@@ -8,6 +8,7 @@ import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import automate.logger
+import io.ktor.client.plugins.logging.*
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
@@ -22,6 +23,8 @@ class KtorClient @Inject constructor() {
                     isLenient = true
                 })
             }
+
+//            install(Logging)
         }.also {
             logger.debug("KtorClient initialized.")
         }
