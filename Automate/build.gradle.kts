@@ -42,8 +42,14 @@ dependencies {
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     // endregion
 
+    // region Logging
     //https://github.com/oshai/kotlin-logging
     implementation("io.github.oshai:kotlin-logging-jvm:4.0.1")
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation("org.slf4j:slf4j-log4j12:1.7.27")
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j
+    implementation("org.slf4j:slf4j-reload4j:2.0.7")
+    // endregion
 
     // region Kotest
     val kotestVersion = "5.6.2"
