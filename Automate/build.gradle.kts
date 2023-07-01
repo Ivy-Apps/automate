@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.8.21"
+    kotlin("plugin.serialization") version "1.8.21"
     application
 }
 
@@ -19,6 +20,15 @@ dependencies {
     implementation("io.arrow-kt:arrow-fx-coroutines")
     // https://mvnrepository.com/artifact/io.arrow-kt/arrow-exact-jvm
     implementation("io.arrow-kt:arrow-exact-jvm:0.1.0")
+    // endregion
+
+    // region Ktor + Kotlinx serialization
+    val ktorVersion = "2.3.2"
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     // endregion
 
     // region Kotest
