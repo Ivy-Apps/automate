@@ -1,4 +1,4 @@
-package automate.network
+package automate
 
 import automate.di.AppScope
 import automate.di.SingleIn
@@ -7,8 +7,6 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import automate.logger
-import io.ktor.client.plugins.logging.*
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)

@@ -1,7 +1,6 @@
 package automate
 
 import automate.di.DaggerAppComponent
-import automate.network.KtorClient
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.request.*
