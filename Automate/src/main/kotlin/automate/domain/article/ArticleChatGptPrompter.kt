@@ -90,7 +90,6 @@ ${Constants.ARTICLE_REQUIREMENTS}
 data class ArticleGptOptimized(
     val title: String,
     val topic: String,
-    val introduction: String,
     val sections: List<String>,
     val images: List<String>,
     val lastSection: BodyItem.Section?,
@@ -100,7 +99,6 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
     return ArticleGptOptimized(
         title = title,
         topic = topic,
-        introduction = introduction,
         sections = body.mapNotNull {
             when (it) {
                 is BodyItem.Image -> null

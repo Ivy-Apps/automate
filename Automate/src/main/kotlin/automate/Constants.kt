@@ -18,6 +18,4 @@ Svelte for beginners build your first reactive website with real-world code exam
     const val MAX_ACTIVE_ERRORS = 2
     const val MAX_ERRORS = 12
     const val MAX_STEPS = 30
-    const val MAX_EXCEPTION_LENGTH = 120
-    const val MAX_BODY_SECTIONS_HISTORY = 5
 }

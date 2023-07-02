@@ -9,6 +9,7 @@ import javax.inject.Inject
 class ArticleProducer @Inject constructor() {
     fun toMarkdown(article: Article) = buildString {
         append("# ${article.title}\n")
+        append("\n${article.introduction}")
         article.body.forEach { item ->
             when (item) {
                 is BodyItem.Image -> {
@@ -18,15 +19,14 @@ class ArticleProducer @Inject constructor() {
                 }
 
                 is BodyItem.Section -> {
-                    if (item.title != null) {
-                        append("### ${item.title}")
-                        append("\n")
-                    }
+                    append("### ${item.title}")
+                    append("\n")
                     append(item.text)
                     append("\n\n")
                 }
             }
         }
+        append("\n${article.conclusion}")
     }
 
     fun saveInFile(article: Article) {

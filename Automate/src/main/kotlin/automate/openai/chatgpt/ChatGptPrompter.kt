@@ -2,7 +2,6 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.raise.catch
-import automate.Constants
 import automate.data.ModelFeedback
 import automate.openai.chatgpt.network.ChatGptMessage
 import automate.openai.chatgpt.network.ChatGptRole
@@ -17,9 +16,6 @@ import kotlinx.serialization.json.Json
 abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     private val chatGptService: ChatGptService,
 ) {
-    companion object {
-        const val FINALIZE_TAG = "[FINALIZE]"
-    }
 
     /**
      * a writer, an Android Developer
@@ -109,7 +105,7 @@ Continue by selecting appropriate options until the task is completed.
             )
         )
 
-        val response = Json.decodeFromString<ChatGptReply>(responseJson)
+        val response = parseChatGptResponse(responseJson)
         val optionIndex = response.choice.first().code - 'A'.code
         Either.Right(
             availableTransition[optionIndex] to (response.input ?: emptyMap())
@@ -118,11 +114,17 @@ Continue by selecting appropriate options until the task is completed.
         it.printStackTrace()
         Either.Left(
             ModelFeedback.Error(
-                feedback = "Exception: ${
-                    it.message?.take(Constants.MAX_EXCEPTION_LENGTH) ?: it
-                }."
+                feedback = "Exception: $it."
             )
         )
+    }
+
+    private fun parseChatGptResponse(responseJson: String): ChatGptReply {
+        return try {
+            Json.decodeFromString<ChatGptReply>(responseJson)
+        } catch (e: Exception) {
+            Json.decodeFromString<ChatGptReply>("$responseJson}")
+        }
     }
 
     protected fun List<Trans>.toOptions(): List<Choice> {
