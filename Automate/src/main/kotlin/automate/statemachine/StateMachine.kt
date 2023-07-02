@@ -98,12 +98,9 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
 
             is Either.Right -> {
                 val (state, suggestions) = res.value
-                feedback = feedback.map {
-                    when (it) {
-                        is ModelFeedback.Error -> it.copy(resolved = true)
-                        else -> it
-                    }
-                } + suggestions
+                feedback = feedback.filterIsInstance(
+                    ModelFeedback.Suggestion::class.java
+                ) + suggestions
                 internalState.value = state
                 run()
                 return

@@ -20,7 +20,6 @@ sealed interface ModelFeedback {
     @Serializable
     data class Error(
         override val feedback: String,
-        val resolved: Boolean = false,
     ) : ModelFeedback {
         override val feedbackType = "ERROR"
         override val description = """

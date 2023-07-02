@@ -15,7 +15,7 @@ Svelte for beginners build your first reactive website with real-world code exam
 4. The total length of the article should be approximately 1024 words.
 """.normalizePrompt()
 
-    const val MAX_ACTIVE_ERRORS = 2
+    const val MAX_ACTIVE_ERRORS = 4
     const val MAX_ERRORS = 12
     const val MAX_STEPS = 30
 }
