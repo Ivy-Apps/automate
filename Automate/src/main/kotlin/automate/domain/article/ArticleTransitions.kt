@@ -83,11 +83,11 @@ object AddSectionTransition : ArticleTransition() {
     )
     val PARAM_TEXT = TransitionParam(
         name = "text",
-        description = "The text of the article paragraph.",
+        description = "The text of the article section. Give examples.",
         type = String::class,
         tips = listOf(
             "Supports Markdown.",
-            "Code examples are recommended.",
+            "Code examples are a must!",
             "Keep it short, straightforward and fun."
         )
     )
@@ -102,13 +102,13 @@ object AddSectionTransition : ArticleTransition() {
         val text = requiredParam(input, PARAM_TEXT)
 
         val article = state.data
-        val sections = article.sections()
+        val sections = article.sectionsTitles()
         val duplicatedSection = sections.any { sectionTitle ->
             sectionTitle.equals(title, ignoreCase = true)
         }
         if (duplicatedSection) {
             raise(
-                Error("Don't create a '$title' section!")
+                Error("Section with a title '$title' already exists. Add a new unique section.")
             )
         }
 

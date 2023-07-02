@@ -21,6 +21,8 @@ class ArticleProducer @Inject constructor() {
                 }
             }
         }
+        append("\n\n\n")
+        append("### Conclusion")
         append("\n\n${article.conclusion}")
     }
 
@@ -36,7 +38,7 @@ class ArticleProducer @Inject constructor() {
         articleTitle: String,
         content: String
     ) {
-        val pathname = "content/$articleTitle (${LocalDateTime.now()}).md"
+        val pathname = "content/$[${LocalDateTime.now()}] articleTitle.md"
         File(pathname).writeText(content)
         println("Article saved in '$pathname'.")
     }

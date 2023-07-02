@@ -32,7 +32,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
 
     override fun example(): Pair<String, ChatGptReply> {
         val state = ArticleCurrentState(
-            data = Article(
+            article = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
                 introduction = "",
                 title = "",
@@ -65,7 +65,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
         choicesLeft: Int
     ): String {
         val result = ArticleCurrentState(
-            data = data.optimizeForChatGpt(),
+            article = data.optimizeForChatGpt(),
             expectedOutcome = state.expectedOutcome,
             choices = options,
             feedback = feedback.map {
@@ -93,7 +93,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
 
     @Serializable
     data class ArticleCurrentState(
-        override val data: ArticleGptOptimized,
+        override val article: ArticleGptOptimized,
         override val expectedOutcome: String,
         override val choices: List<Choice>,
         override val feedback: List<String>,
@@ -105,7 +105,8 @@ ${Constants.ARTICLE_REQUIREMENTS}
 data class ArticleGptOptimized(
     val title: String,
     val topic: String,
-    val sections: List<String>,
+    val introduction: String,
+    val sectionsTitles: List<String>,
     val body: List<BodyItem>,
 )
 
@@ -113,7 +114,8 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
     return ArticleGptOptimized(
         title = title,
         topic = topic,
-        sections = sections(),
+        introduction = introduction,
+        sectionsTitles = sectionsTitles(),
         body = body,
     )
 }

@@ -16,7 +16,8 @@ class ArticleStateMachine @Inject constructor(
     override val prompter = articleChatGptPrompter
 
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
-        val body = state.data.body
+        val article = state.data
+        val body = article.body
         return when (state) {
             ArticleState.SetTitle -> {
                 listOf(SetTitleTransition)
@@ -29,7 +30,7 @@ class ArticleStateMachine @Inject constructor(
             is ArticleState.WriteBody -> {
                 buildList {
                     add(AddSectionTransition)
-                    if (body.size > 5) {
+                    if (article.sectionsTitles().size >= Constants.MIN_SECTIONS_COUNT) {
                         add(WriteConclusionTransition)
                     }
                 }
