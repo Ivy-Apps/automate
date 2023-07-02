@@ -4,12 +4,12 @@ import automate.openai.chatgpt.normalizePrompt
 
 object Constants {
     const val MODEL_LABEL =
-        "an expert frontend developer specializing in HTML and CSS"
+        "a Scrum and project manager experts that happens to be a lazy developer"
     val ARTICLE_TOPIC = """
-Learn HTML and CSS from real-world examples and build modern responsive UI.
+Scrum explained for lazy developers that think it's bullshit.
 """.normalizePrompt()
-    const val ARTICLE_TARGET_WORDS_COUNT = 2_000
-    const val MIN_SECTIONS_COUNT = 4
+    const val ARTICLE_TARGET_WORDS_COUNT = 1_000
+    const val MIN_SECTIONS_COUNT = 3
 
     val ARTICLE_REQUIREMENTS = """
 1. Incorporate as many real-world code examples as possible. Ensure all code is properly formatted and escaped in the JSON.

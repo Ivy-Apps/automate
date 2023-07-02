@@ -89,7 +89,6 @@ object AddSectionTransition : ArticleTransition() {
             "Supports Markdown use: **bold** - bullets [links]().",
             "Do NOT repeat the \"introduction\"!",
             "Do NOT repeat existing content!",
-            "Code examples are a must!",
         )
     )
 
