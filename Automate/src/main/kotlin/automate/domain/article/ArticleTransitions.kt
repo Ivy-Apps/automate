@@ -16,7 +16,7 @@ sealed class ArticleTransition : Transition<ArticleState, Article>()
 object SetTitleTransition : ArticleTransition() {
     override val name = "Set the article title"
 
-    private val PARAM_TITLE = TransitionParam(
+    val PARAM_TITLE = TransitionParam(
         name = "articleTitle",
         description = "The title of the Article up to 100 chars",
         tips = listOf(
@@ -41,7 +41,7 @@ object SetTitleTransition : ArticleTransition() {
     }
 }
 
-object AddParagraphTransition : ArticleTransition() {
+object AddSectionTransition : ArticleTransition() {
     override val name: String = "Add a paragraph"
 
     val PARAM_TITLE = TransitionParam(

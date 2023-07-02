@@ -23,14 +23,14 @@ class ArticleStateMachine @Inject constructor(
             }
 
             is ArticleState.AddedImage -> {
-                listOf(AddParagraphTransition)
+                listOf(AddSectionTransition)
             }
 
             is ArticleState.Writing -> {
                 buildList {
                     add(AddImageTransition)
                     if (!body.lastNAreParagraphs(4)) {
-                        add(AddParagraphTransition)
+                        add(AddSectionTransition)
                     }
                     if (body.size > 3) {
                         add(FinalizeTransition)

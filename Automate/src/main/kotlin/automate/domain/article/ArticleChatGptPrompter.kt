@@ -32,26 +32,21 @@ class ArticleChatGptPrompter @Inject constructor(
     override fun example(): Pair<String, ChatGptReply> {
         val state = ArticleCurrentState(
             currentState = Article(
-                topic = "HTTP requests in Kotlin using Kotlin Flows and Ktor.",
-                title = "[Android/Multiplatform] Kotlin Flows + Ktor = Flawless HTTP requests",
+                topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
+                title = "",
                 body = listOf()
             ),
             choices = listOf(
-                AddImageTransition,
-                AddParagraphTransition,
+                SetTitleTransition,
+                AddSectionTransition,
             ).toOptions(),
             feedback = listOf(),
             choicesLeft = 13,
         )
         val response = ChatGptReply(
-            choice = "B",
+            choice = "A",
             input = mapOf(
-                AddParagraphTransition.PARAM_TITLE.name to "Introduction",
-                AddParagraphTransition.PARAM_TEXT.name to """
-                    Let’s face it! The majority of our work is making requests to an [API]() (usually an [HTTP]() or a [GraphQL]() one) and providing a UI for all possible states — like Loading, Success, Error, and Empty.
-                    
-                    This should be **simple!** But… Have we set the time to think more deeply about it? From my 8+ years as an Android Developer, more often than not, we tend to complicate things that shouldn’t be complicated at all.
-                """.trimIndent()
+                SetTitleTransition.PARAM_TITLE.name to "[Android] Kotlin Flows + Ktor = Flawless HTTP requests",
             )
         )
 
