@@ -50,7 +50,7 @@ object WriteIntroduction : ArticleTransition() {
         name = "introduction",
         type = String::class,
         description = """
-            Start the article with a short engaging paragraph about the topic.
+            Prepare the reader for what they'll learn in this article in a fun and engaging way.
         """.trimIndent(),
         tips = listOf(
             "Keep it very short."
