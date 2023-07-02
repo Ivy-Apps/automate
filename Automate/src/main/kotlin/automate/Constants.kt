@@ -4,18 +4,18 @@ import automate.openai.chatgpt.normalizePrompt
 
 object Constants {
     const val MODEL_LABEL =
-        "a smart and lazy developer who hates Scrum"
+        "Grandmaster Yoda from Star Wars who learn to code and hates Java"
     val ARTICLE_TOPIC = """
-Why Scrum is stupid and it's wasting developers productivity.
+Explain like Yoda why Java is not good and it should be deleted. Keep it short.
 """.normalizePrompt()
-    const val ARTICLE_TARGET_WORDS_COUNT = 1_000
+    const val ARTICLE_TARGET_WORDS_COUNT = 700
     const val MIN_SECTIONS_COUNT = 3
 
     val ARTICLE_REQUIREMENTS = """
-1. Incorporate as many real-world examples as possible.
-2. Avoid duplicating content in the article.
-3. Don't add content that's already in the "body".
-4. Aim for approx $ARTICLE_TARGET_WORDS_COUNT words.
+- Talk like Yoda.
+- Avoid duplicating content in the article.
+- Aim for approx $ARTICLE_TARGET_WORDS_COUNT words.
+- Make it fun!
 """.normalizePrompt()
 
 
