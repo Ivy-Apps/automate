@@ -65,18 +65,24 @@ class ArticleChatGptPrompter @Inject constructor(
     }
 
     override fun currentStateAsJson(
-        currentState: ArticleState,
+        data: Article,
         options: List<Option>,
         feedback: List<ModelFeedback>,
         choicesLeft: Int
     ): String {
         val state = ArticleCurrentState(
-            currentState = currentState.data,
+            currentState = data,
             options = options,
             feedback = feedback,
             choicesLeft = choicesLeft
         )
         return Json.encodeToString(state)
+    }
+
+    override fun refineData(state: ArticleState): Article {
+        return state.data.copy(
+            body = state.data.body.takeLast(Constants.MAX_BODY_SECTIONS_HISTORY),
+        )
     }
 
     @Serializable

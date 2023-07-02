@@ -2,8 +2,8 @@ package automate.demo.article
 
 import arrow.core.Either
 import arrow.core.raise.either
-import automate.data.ModelFeedback
 import automate.data.ModelFeedback.Error
+import automate.data.ModelFeedback.Suggestion
 import automate.demo.article.data.Article
 import automate.demo.article.data.BodyItem
 import automate.openai.chatgpt.ChatGptPrompter
@@ -23,7 +23,7 @@ object SetTitleTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         ArticleState.Writing(
             data = state.data.copy(title = title)
@@ -46,10 +46,26 @@ object AddSectionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
         val article = state.data
+
+        val duplicatedSection = article.body.any {
+            (it as? BodyItem.Section)?.title?.equals(title, ignoreCase = true) == true
+        }
+        if (duplicatedSection) {
+            raise(
+                Error(
+                    """
+                    Duplicated Article section.
+                    Section with title '$title' already exists.
+                    Write only unique sections.
+                """.trimIndent()
+                )
+            )
+        }
+
         val section = BodyItem.Section(title = title, text = text)
         ArticleState.Writing(
             data = article.copy(
@@ -75,7 +91,7 @@ object AddImageTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         val imagePrompt = requiredParam(input, PARAM_IMAGE_PROMPT)
         val article = state.data
         ArticleState.AddedImage(
@@ -94,7 +110,7 @@ object FinalizeTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         ArticleState.Finished(state.data) to emptyList()
     }
 }

@@ -31,11 +31,13 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     protected abstract fun example(): Pair<String, ChatGptReply>
 
     protected abstract fun currentStateAsJson(
-        currentState: S,
+        data: A,
         options: List<Option>,
         feedback: List<ModelFeedback>,
         choicesLeft: Int,
     ): String
+
+    protected abstract fun refineData(state: S): A
 
 
     private fun modelContext(
@@ -98,7 +100,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         maxSteps: Int,
     ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> = catch({
         val prompt = currentStateAsJson(
-            currentState = state,
+            data = refineData(state),
             options = availableTransition.toOptions(),
             feedback = feedback,
             choicesLeft = maxSteps - steps,

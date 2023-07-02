@@ -5,4 +5,5 @@ object Constants {
     const val MAX_STEPS = 15
     const val MAX_ERRORS = 2
     const val MAX_EXCEPTION_LENGTH = 120
+    const val MAX_BODY_SECTIONS_HISTORY = 3
 }
