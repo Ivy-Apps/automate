@@ -2,6 +2,7 @@ package automate
 
 import automate.demo.article.ArticleProducer
 import automate.demo.article.ArticleStateMachine
+import automate.demo.article.data.BodyItem
 import automate.di.DaggerAppComponent
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -29,7 +30,22 @@ class AutomateApp @Inject constructor(
         scope.launch {
             withContext(Dispatchers.IO) {
                 articleStateMachine.state.collectLatest { state ->
-                    println("Iteration #${++iteration}: -----------------------")
+                    val body = state.data.body
+                    val sections = body.count { it is BodyItem.Section }
+                    val images = body.count { it is BodyItem.Image }
+                    val articleLength = body.sumOf {
+                        when (it) {
+                            is BodyItem.Image -> 0
+                            is BodyItem.Section -> it.text.length
+                        }
+                    }
+                    logger.debug(
+                        """
+                        Iteration #${++iteration}: 
+                        ${articleStateMachine.errors} errors | $sections sections | $images images
+                        Article length: $articleLength chars.
+                    """.trimIndent()
+                    )
                 }
             }
         }

@@ -28,8 +28,7 @@ abstract class Transition<S : State<A>, A> {
         ensureNotNull(value) {
             ModelFeedback.Error(
                 """
-                Value for parameter "${param.name}" with type '${param.type.simpleName}'
-                was not found in map: $inputMap.
+                Value for parameter '${param.name}' not found in the "input" map.
                 """.trimIndent()
             )
         }
