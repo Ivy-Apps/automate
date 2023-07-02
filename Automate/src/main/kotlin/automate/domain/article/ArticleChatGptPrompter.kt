@@ -7,6 +7,7 @@ import automate.di.SingleIn
 import automate.domain.article.data.Article
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.network.ChatGptService
+import automate.openai.chatgpt.normalizePrompt
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -25,7 +26,7 @@ class ArticleChatGptPrompter @Inject constructor(
         Write an article on the following topic: "${Constants.ARTICLE_TOPIC}".
         Requirements:
         ${Constants.ARTICLE_REQUIREMENTS}
-        """.trimIndent()
+        """.normalizePrompt()
     }
 
     override fun example(): Pair<String, ChatGptReply> {

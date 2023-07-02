@@ -1,5 +1,7 @@
 package automate
 
+import automate.openai.chatgpt.normalizePrompt
+
 object Constants {
     val ARTICLE_TOPIC = """
     Svelte web development explained in practice with short and simple code examples.
@@ -9,7 +11,7 @@ object Constants {
     2. It must NOT have repeated article sections.    
     3. Each paragraph must be short.
     4. Target length: around 1024 words.
-    """.trimIndent()
+    """.normalizePrompt()
 
     const val MAX_STEPS = 3
     const val MAX_ERRORS = 10

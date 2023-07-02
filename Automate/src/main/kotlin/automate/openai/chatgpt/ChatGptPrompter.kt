@@ -169,8 +169,8 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         val name: String,
         val description: String? = null,
     )
-
-    private fun String.normalizePrompt(): String = trimIndent()
-        .trim().replace("\t", "")
 }
+
+fun String.normalizePrompt(): String = trimIndent()
+    .trim().replace("\t", "")
 
