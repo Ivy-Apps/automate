@@ -86,8 +86,9 @@ object AddSectionTransition : ArticleTransition() {
         description = "The text of the article section. Give examples.",
         type = String::class,
         tips = listOf(
-            "Supports Markdown.",
+            "Supports Markdown use: **bold** - bullets [links]().",
             "Do NOT repeat the \"introduction\"!",
+            "Do NOT repeat existing content!",
             "Code examples are a must!",
         )
     )

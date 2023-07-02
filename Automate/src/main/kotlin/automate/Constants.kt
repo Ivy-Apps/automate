@@ -4,9 +4,9 @@ import automate.openai.chatgpt.normalizePrompt
 
 object Constants {
     const val MODEL_LABEL =
-        "an expert technical writer specializing in Android, Kotlin, Jetpack Compose and the latest trends in software development"
+        "an expert software architect and scientist specializing in computer science and software engineering"
     val ARTICLE_TOPIC = """
-The fundamentals of Jetpack Compose with appropriate code examples for each section.
+Explain simply the OOP SOLID principles with good real-world and Kotlin examples.
 """.normalizePrompt()
     const val ARTICLE_TARGET_WORDS_COUNT = 1_500
     const val MIN_SECTIONS_COUNT = 4

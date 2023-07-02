@@ -108,8 +108,13 @@ Continue by selecting appropriate options until the task is completed.
         val response = parseChatGptResponse(responseJson)
 
         val choiceIndex = response.choiceId
+        val transition = try {
+            availableTransitions[choiceIndex]
+        } catch (e: IndexOutOfBoundsException) {
+            availableTransitions[choiceIndex - 1]
+        }
         Either.Right(
-            availableTransitions[choiceIndex] to (response.input ?: emptyMap())
+            transition to (response.input ?: emptyMap())
         )
     }) {
         it.printStackTrace()
@@ -137,7 +142,7 @@ Continue by selecting appropriate options until the task is completed.
     protected fun List<Trans>.toOptions(): List<Choice> {
         return mapIndexed { index, transition ->
             Choice(
-                choiceId = index,
+                choiceId = index + 1, // start from 1 because ChatGPT is a retard
                 title = transition.name,
                 description = transition.description,
                 input = transition.input.map { param ->

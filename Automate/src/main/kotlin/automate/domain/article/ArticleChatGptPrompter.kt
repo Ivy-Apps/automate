@@ -47,7 +47,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
             feedback = listOf(),
         )
         val response = ChatGptReply(
-            choiceId = 0,
+            choiceId = 1,
             input = mapOf(
                 SetTitleTransition.PARAM_TITLE.name to "[Android] Kotlin Flows + Ktor = Flawless HTTP requests",
             )
