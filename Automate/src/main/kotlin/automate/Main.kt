@@ -40,6 +40,9 @@ class AutomateApp @Inject constructor(
                         }
                     }
                     logger.debug(
+                        "--------------------------------------------------"
+                    )
+                    logger.debug(
                         """
                         Iteration #${++iteration}: 
                         ${articleStateMachine.errors} errors | $sections sections | $images images

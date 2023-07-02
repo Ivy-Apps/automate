@@ -18,8 +18,10 @@ class ArticleProducer @Inject constructor() {
                 }
 
                 is BodyItem.Section -> {
-                    append("### ${item.title}")
-                    append("\n")
+                    if (item.title != null) {
+                        append("### ${item.title}")
+                        append("\n")
+                    }
                     append(item.text)
                     append("\n\n")
                 }

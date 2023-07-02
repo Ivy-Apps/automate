@@ -16,5 +16,5 @@ sealed interface BodyItem {
     data class Image(val prompt: String) : BodyItem
 
     @Serializable
-    data class Section(val title: String, val text: String) : BodyItem
+    data class Section(val title: String?, val text: String) : BodyItem
 }

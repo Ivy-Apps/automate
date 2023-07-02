@@ -22,16 +22,8 @@ class ArticleChatGptPrompter @Inject constructor(
 
     override fun taskPrompt(): String {
         return """
-            Write an article on the following topic "${Constants.ARTICLE_TOPIC}".
-            Requirements:
-            1. It must have at least 2 images.
-            2. Use Markdown formatting where possible.
-            3. It must NOT have repeated article sections.
-            
-            Bonus:
-            - Keep it short.
-            - Make it engaging.
-            - Make it fun.
+        Write an article on the following topic: "${Constants.ARTICLE_TOPIC}".
+        ${Constants.ARTICLE_REQUIREMENTS}
         """.trimIndent()
     }
 
@@ -55,7 +47,7 @@ class ArticleChatGptPrompter @Inject constructor(
                 AddSectionTransition.PARAM_TITLE.name to "Introduction",
                 AddSectionTransition.PARAM_TEXT.name to """
                     Let’s face it! The majority of our work is making requests to an [API]() (usually an [HTTP]() or a [GraphQL]() one) and providing a UI for all possible states — like Loading, Success, Error, and Empty.
-
+                    
                     This should be **simple!** But… Have we set the time to think more deeply about it? From my 8+ years as an Android Developer, more often than not, we tend to complicate things that shouldn’t be complicated at all.
                 """.trimIndent()
             )

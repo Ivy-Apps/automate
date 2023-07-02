@@ -34,6 +34,12 @@ abstract class Transition<S : State<A>, A> {
         }
         return value
     }
+
+    @StateMachineDslMarker
+    protected inline fun <reified T : Any> Raise<ModelFeedback.Error>.optionalParamø(
+        inputMap: InputMap,
+        param: TransitionParam<T>
+    ): T? = inputMap[param.name] as? T
 }
 
 @Serializable
@@ -41,4 +47,6 @@ data class TransitionParam<T : Any>(
     val name: String,
     val type: KClass<T>,
     val description: String? = null,
+    val tips: List<String>? = null,
+    val optional: Boolean = false,
 )
