@@ -65,7 +65,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 content = """
                 Your task is to:
                 '''
-                ${taskPrompt()}
+                ${taskPrompt().normalizePrompt()}
                 '''
                 by making choices until the task is done.
                 """.normalizePrompt()
@@ -170,6 +170,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         val description: String? = null,
     )
 
-    private fun String.normalizePrompt(): String = trimIndent().trim()
+    private fun String.normalizePrompt(): String = trimIndent()
+        .trim().replace("\t", "")
 }
 

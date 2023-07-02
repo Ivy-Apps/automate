@@ -24,10 +24,11 @@ class ChatGptConversionLogger @Inject constructor(
             !prePromptLogged || it.role != ChatGptRole.System
         }.onEach { message ->
             logMessage(
-                author = "[${message.role}] ${message.name ?: "user"}:",
+                author = "[${message.role}] ${message.name ?: "user"}",
                 content = message.content
             )
         }
+        prePromptLogged = true
 
         logMessage(
             author = "Chat GPT:",
