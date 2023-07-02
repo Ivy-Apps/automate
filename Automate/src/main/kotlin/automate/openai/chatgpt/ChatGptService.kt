@@ -1,13 +1,12 @@
-package automate.ai.chatgpt.api
+package automate.openai.chatgpt
 
 import automate.KtorClient
-import automate.ai.OpenAiSecrets
 import automate.di.AppScope
 import automate.di.SingleIn
+import automate.openai.OpenAiSecrets
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.serialization.Serializable
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
@@ -43,32 +42,3 @@ class ChatGptService @Inject constructor(
         return response.body<ChatGptResponse>().choices.first().message.content
     }
 }
-
-enum class ChatGptRole(val stringValue: String) {
-    System("system"),
-    User("user"),
-    Assistant("assistant");
-}
-
-@Serializable
-data class ChatGptRequest(
-    val model: String,
-    val messages: List<ChatGptMessage>,
-)
-
-@Serializable
-data class ChatGptResponse(
-    val choices: List<ChatGptChoice>,
-)
-
-@Serializable
-data class ChatGptChoice(
-    val index: Int,
-    val message: ChatGptMessage,
-)
-
-@Serializable
-data class ChatGptMessage(
-    val role: String,
-    val content: String,
-)

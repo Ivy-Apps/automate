@@ -1,8 +1,5 @@
-package automate.ai.chatgpt
+package automate.openai.chatgpt
 
-import automate.ai.chatgpt.api.ChatGptMessage
-import automate.ai.chatgpt.api.ChatGptRole
-import automate.ai.chatgpt.api.ChatGptService
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
@@ -16,24 +13,12 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun currentStateJson(state: S, error: String?): String
 
-    private val messages: MutableList<ChatGptMessage> = mutableListOf()
-    private var prePrompted = false
-
     suspend fun prompt(
         state: S,
         error: String?,
         maxSteps: Int,
         availableTransition: List<Trans>
     ): Pair<Trans, InputMap> {
-        if (!prePrompted) {
-            messages.add(
-                ChatGptMessage(
-                    role = ChatGptRole.System.stringValue,
-                    content = prePrompt(state.data, maxSteps)
-                )
-            )
-            prePrompted = true
-        }
 
         val prompt = buildString {
             val currentStateJson = currentStateJson(state, error)
@@ -47,21 +32,15 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
             """.trimIndent()
             )
         }
-        messages.add(
-            ChatGptMessage(
-                role = ChatGptRole.User.stringValue,
-                content = prompt,
-            )
-        )
 
         val responseJson = chatGptService.prompt(
             conversation = listOf(
                 ChatGptMessage(
-                    role = ChatGptRole.System.stringValue,
+                    role = ChatGptRole.System,
                     content = prePrompt(state.data, maxSteps)
                 ),
                 ChatGptMessage(
-                    role = ChatGptRole.User.stringValue,
+                    role = ChatGptRole.User,
                     content = prompt,
                 )
             )

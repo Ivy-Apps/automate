@@ -1,4 +1,4 @@
-package automate.ai
+package automate.openai
 
 import automate.di.AppScope
 import automate.di.SingleIn

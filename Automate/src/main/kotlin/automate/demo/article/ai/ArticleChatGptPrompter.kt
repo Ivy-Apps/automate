@@ -1,12 +1,12 @@
 package automate.demo.article.ai
 
-import automate.ai.chatgpt.ChatGptPrompter
-import automate.ai.chatgpt.api.ChatGptService
 import automate.demo.article.Article
 import automate.demo.article.statemachine.ArticleState
 import automate.demo.article.statemachine.ArticleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
+import automate.openai.chatgpt.ChatGptPrompter
+import automate.openai.chatgpt.ChatGptService
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
