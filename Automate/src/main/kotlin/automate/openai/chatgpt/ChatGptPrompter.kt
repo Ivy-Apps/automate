@@ -106,8 +106,8 @@ Continue by selecting appropriate options until the task is completed.
                 content = prompt,
             )
         )
-
         val response = parseChatGptResponse(responseJson)
+
         val optionIndex = response.choice.first().code - 'A'.code
         Either.Right(
             availableTransition[optionIndex] to (response.input ?: emptyMap())
@@ -125,7 +125,13 @@ Continue by selecting appropriate options until the task is completed.
         return try {
             Json.decodeFromString<ChatGptReply>(responseJson)
         } catch (e: Exception) {
-            Json.decodeFromString<ChatGptReply>("$responseJson}")
+            try {
+                // Add missing '}'
+                Json.decodeFromString<ChatGptReply>("$responseJson}")
+            } catch (e: Exception) {
+                // Remove duplicated '}'
+                Json.decodeFromString<ChatGptReply>(responseJson.dropLast(1))
+            }
         }
     }
 

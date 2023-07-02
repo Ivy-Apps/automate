@@ -75,8 +75,11 @@ object AddSectionTransition : ArticleTransition() {
 
     val PARAM_TITLE = TransitionParam(
         name = "title",
-        description = "The title of the article section.",
-        type = String::class
+        description = "The title of the article section. It must be an unique section.",
+        type = String::class,
+        tips = listOf(
+            "Do NOT duplicate already existing sections."
+        )
     )
     val PARAM_TEXT = TransitionParam(
         name = "text",
