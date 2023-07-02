@@ -33,16 +33,14 @@ class AutomateApp @Inject constructor(
                 }
             }
         }
-        try {
-            articleStateMachine.run()
-            println("Result: ---------------------")
-            val article = articleStateMachine.state.value.data
-            println(articleProducer.toMarkdown(article))
-            println("--------------------------")
-            articleProducer.saveInFile(article)
-        } catch (e: Exception) {
-            articleProducer.saveInFile(articleStateMachine.state.value.data)
-            throw e
-        }
+        articleStateMachine.run()
+        println("Result: ---------------------")
+        val article = articleStateMachine.state.value.data
+        println(articleProducer.toMarkdown(article))
+        println("--------------------------")
+
+        articleProducer.saveInFile(article)
+        println("Feedback:")
+        println(articleStateMachine.feedback)
     }
 }

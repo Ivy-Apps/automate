@@ -34,9 +34,9 @@ object SetTitleTransition : ArticleTransition() {
 object AddSectionTransition : ArticleTransition() {
     override val name: String = "Add a paragraph section"
 
-    private val PARAM_TITLE = TransitionParam(name = "sectionTitle", type = String::class)
-    private val PARAM_TEXT = TransitionParam(
-        name = "sectionText",
+    val PARAM_TITLE = TransitionParam(name = "sectionTitle", type = String::class)
+    val PARAM_TEXT = TransitionParam(
+        name = "sectionBody",
         type = String::class,
         description = "Supports Markdown"
     )

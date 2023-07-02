@@ -2,6 +2,7 @@ package automate.statemachine
 
 import arrow.core.Either
 import automate.data.ModelFeedback
+import automate.logger
 import automate.openai.chatgpt.ChatGptPrompter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
         private set
     var errors = 0
         private set
-    private var feedback: List<ModelFeedback> = listOf()
+    var feedback: List<ModelFeedback> = listOf()
+        private set
 
     abstract fun availableTransitions(state: S): List<Trans>
 
@@ -42,7 +44,9 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
 
     suspend fun run() {
         if (++steps >= maxSteps) {
-            feedback += ModelFeedback.FatalError("Max steps reached! Reached $steps steps.")
+            val msg = "Max steps reached! Reached $steps steps."
+            logger.info(msg)
+            feedback += ModelFeedback.FatalError(msg)
             onFinished(state.value, feedback)
             return
         }
@@ -57,6 +61,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             feedback = feedback,
         )
         if (next is Either.Left) {
+            errors++
             feedback += next.value
             run()
             return
@@ -75,7 +80,9 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
                     run()
                     return
                 } else {
-                    feedback += ModelFeedback.FatalError("Max errors reached! Reached $errors errors.")
+                    val msg = "Max errors reached! Reached ${++errors} errors."
+                    logger.error(msg)
+                    feedback += ModelFeedback.FatalError(msg)
                     onFinished(state.value, feedback)
                     return
                 }

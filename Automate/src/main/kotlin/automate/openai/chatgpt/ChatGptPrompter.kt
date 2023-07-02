@@ -2,9 +2,9 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.raise.catch
+import automate.Constants
 import automate.data.ModelFeedback
 import automate.openai.chatgpt.network.ChatGptMessage
-import automate.openai.chatgpt.network.ChatGptResponse
 import automate.openai.chatgpt.network.ChatGptRole
 import automate.openai.chatgpt.network.ChatGptService
 import automate.statemachine.InputMap
@@ -24,21 +24,20 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     /**
      * a writer, an Android Developer
      */
-    protected abstract fun aLabel(data: A): String
+    protected abstract fun aLabel(): String
 
-    protected abstract fun taskPrompt(data: A): String
+    protected abstract fun taskPrompt(): String
 
-    protected abstract fun example(): Pair<State<A>, ChatGptResponse>
+    protected abstract fun example(): Pair<CurrentState<A>, ChatGptReply>
 
 
     private fun modelContext(
-        data: A,
     ): List<ChatGptMessage> = buildList {
         add(
             ChatGptMessage(
                 role = ChatGptRole.System,
                 content = """
-                You're ${aLabel(data)} and a pattern-following assistant that communicates using JSON.
+                You're ${aLabel()} and a pattern-following assistant that communicates using JSON.
                 You receive:
                 - "currentState": the state of the task that you're completing.
                 - "choices": list of available choices with their input.
@@ -57,7 +56,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 content = """
                 Your task is to:
                 '''
-                ${taskPrompt(data)}
+                ${taskPrompt()}
                 '''
                 by making the optimum number of choices until the task is achieved.
                 When ready you must finalize the goal with the "$FINALIZE_TAG" choices before
@@ -100,28 +99,29 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         val prompt = Json.encodeToString(currentState)
 
         val responseJson = chatGptService.prompt(
-            conversation = modelContext(
-                state.data,
-            ) + ChatGptMessage(
+            conversation = modelContext() + ChatGptMessage(
                 role = ChatGptRole.User,
                 content = prompt,
             )
         )
 
-        val response = Json.decodeFromString<ChatGTPResponse>(responseJson)
+        val response = Json.decodeFromString<ChatGptReply>(responseJson)
         val optionIndex = response.option.first().code - 'A'.code
         Either.Right(
             availableTransition[optionIndex] to (response.input ?: emptyMap())
         )
     }) {
+        it.printStackTrace()
         Either.Left(
             ModelFeedback.Error(
-                feedback = "Exception: ${it.message}"
+                feedback = "Exception: ${
+                    it.message?.take(Constants.MAX_EXCEPTION_LENGTH) ?: it
+                }."
             )
         )
     }
 
-    private fun List<Trans>.toOptions(): List<Option> {
+    protected fun List<Trans>.toOptions(): List<Option> {
         return mapIndexed { index, transition ->
             Option(
                 key = ('A' + index).toString(),
@@ -138,7 +138,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     }
 
     @Serializable
-    data class ChatGTPResponse(
+    data class ChatGptReply(
         val option: String,
         val input: Map<String, String>? = null
     )
