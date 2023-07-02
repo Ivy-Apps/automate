@@ -6,9 +6,9 @@ object Constants {
     const val MODEL_LABEL =
         "an expert software architect and scientist specializing in computer science and software engineering"
     val ARTICLE_TOPIC = """
-Explain simply the OOP SOLID principles with good real-world and Kotlin examples.
+Explain simply and concise the 5 OOP SOLID principles with good real-world and Kotlin examples.
 """.normalizePrompt()
-    const val ARTICLE_TARGET_WORDS_COUNT = 1_500
+    const val ARTICLE_TARGET_WORDS_COUNT = 2_000
     const val MIN_SECTIONS_COUNT = 4
 
     val ARTICLE_REQUIREMENTS = """
