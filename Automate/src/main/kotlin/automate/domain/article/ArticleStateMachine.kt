@@ -10,6 +10,7 @@ class ArticleStateMachine @Inject constructor(
     articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.SetTitle,
+    maxActiveErrors = Constants.MAX_ACTIVE_ERRORS,
     maxErrors = Constants.MAX_ERRORS,
     maxSteps = Constants.MAX_STEPS,
 ) {

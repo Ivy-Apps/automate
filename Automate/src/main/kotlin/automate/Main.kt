@@ -46,7 +46,7 @@ class AutomateApp @Inject constructor(
                         ------------------------------------------------------
                         Iteration #${iteration++}: 
                         Title: "${article.title}"
-                        ${articleStateMachine.errors} errors | $sections sections | $images images
+                        ${articleStateMachine.errorsOccurred} errors | $sections sections | $images images
                         Article length: $articleWords words.
                     """.trimIndent()
                     )

@@ -9,15 +9,16 @@ import kotlinx.coroutines.flow.StateFlow
 
 abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
     initialState: S,
-    val maxErrors: Int = 2,
-    val maxSteps: Int = 100
+    val maxActiveErrors: Int = 2,
+    val maxErrors: Int = 10,
+    val maxSteps: Int = 30
 ) {
     private val internalState = MutableStateFlow(initialState)
     val state: StateFlow<S> = internalState
 
     var steps = 0
         private set
-    var errors = 0
+    var errorsOccurred = 0
         private set
     var feedback: List<ModelFeedback> = listOf()
         private set
@@ -50,8 +51,15 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             onFinished(state.value, feedback)
             return
         }
-        if (errors >= maxErrors) {
-            val msg = "Max errors reached! Reached $errors errors."
+        if (errorsOccurred >= maxErrors) {
+            val msg = "Max errors reached! Reached $errorsOccurred errors."
+            logger.error(msg)
+            feedback += ModelFeedback.FatalError(msg)
+            onFinished(state.value, feedback)
+            return
+        }
+        if (feedback.count { it is ModelFeedback.Error } >= maxActiveErrors) {
+            val msg = "Max active errors reached! Reached $maxActiveErrors not resolved errors."
             logger.error(msg)
             feedback += ModelFeedback.FatalError(msg)
             onFinished(state.value, feedback)
@@ -68,7 +76,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             feedback = feedback,
         )
         if (next is Either.Left) {
-            errors++
+            errorsOccurred++
             feedback += next.value
             run()
             return
@@ -83,7 +91,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
         ) {
             is Either.Left -> {
                 feedback += res.value
-                errors++
+                errorsOccurred++
                 run()
                 return
             }
