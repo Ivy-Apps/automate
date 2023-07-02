@@ -6,9 +6,9 @@ object Constants {
     const val MODEL_LABEL =
         "an expert technical writer specializing in Android, Kotlin, Jetpack Compose and the latest trends in software development"
     val ARTICLE_TOPIC = """
-Learn Jetpack Compose by example. Everything an Android Developer need to know.
+The fundamentals of Jetpack Compose with appropriate code examples for each section.
 """.normalizePrompt()
-    const val ARTICLE_TARGET_WORDS_COUNT = 2_000
+    const val ARTICLE_TARGET_WORDS_COUNT = 1_500
     const val MIN_SECTIONS_COUNT = 4
 
     val ARTICLE_REQUIREMENTS = """
