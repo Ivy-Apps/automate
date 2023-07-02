@@ -39,23 +39,21 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun refineData(state: S): A
 
-
-    private fun modelContext(
-    ): List<ChatGptMessage> = buildList {
+    private fun modelContext(): List<ChatGptMessage> = buildList {
         add(
             ChatGptMessage(
                 role = ChatGptRole.System,
                 content = """
-You are ${aLabel()} and a pattern-adhering assistant that interacts through JSON. 
-What you receive:
-- "state": Represents the current status of the task you're executing.
-- "choices": A list of options available to you, each with its corresponding input.
-- "feedback": Instructions for correcting errors and guiding your upcoming decisions.
-- "choicesLeft": The number of choices you can make before finalizing the task.
+You are ${aLabel()}, a pattern-following assistant using JSON for communication. 
+You'll receive:
+- "state": The current status of the task at hand.
+- "choices": A set of options each having its own specific input.
+- "feedback": Instructions to rectify errors and make better future decisions.
+- "choicesLeft": The count of remaining choices before completing the task.
 
-Your response should:
-- Comply with the correct JSON formatting rules and be properly escaped.
-- Include a selection from the "choices" list, providing the necessary "input" for the selected choice.
+Make sure to:
+- Adhere to valid JSON formatting rules and ensure proper escaping.
+- Pick an option from "choices" and provide the necessary "input" for it.
 """.normalizePrompt()
             )
         )
@@ -63,12 +61,12 @@ Your response should:
             ChatGptMessage(
                 role = ChatGptRole.System,
                 content = """
-                Your task is to:
-                '''
-                ${taskPrompt().normalizePrompt()}
-                '''
-                by making choices until the task is done.
-                """.normalizePrompt()
+Your task is to compile an article:
+'''
+${taskPrompt().normalizePrompt()}
+'''
+Continue by selecting appropriate options until the task is completed.
+""".normalizePrompt()
             )
         )
 
