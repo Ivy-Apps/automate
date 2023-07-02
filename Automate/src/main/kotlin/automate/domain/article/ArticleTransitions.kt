@@ -22,6 +22,7 @@ object SetTitleTransition : ArticleTransition() {
         tips = listOf(
             "Target length: around 60 chars.",
             "Use symbols like '[]', ':', '-' for better formatting.",
+            "Be creative. Don't copy the topic 1:1."
         ),
         type = String::class,
     )

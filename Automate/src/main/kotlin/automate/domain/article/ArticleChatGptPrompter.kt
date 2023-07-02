@@ -32,13 +32,14 @@ ${Constants.ARTICLE_REQUIREMENTS}
 
     override fun example(): Pair<String, ChatGptReply> {
         val state = ArticleCurrentState(
-            state = Article(
+            data = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
                 introduction = "",
                 title = "",
                 body = listOf(),
                 conclusion = "",
             ).optimizeForChatGpt(),
+            expectedOutcome = ArticleState.SetTitle.expectedOutcome,
             choices = listOf(
                 SetTitleTransition,
                 AddSectionTransition,
@@ -57,29 +58,30 @@ ${Constants.ARTICLE_REQUIREMENTS}
     }
 
     override fun currentStateAsJson(
+        state: ArticleState,
         data: Article,
         options: List<Choice>,
         feedback: List<ModelFeedback>,
         choicesLeft: Int
     ): String {
-        val state = ArticleCurrentState(
-            state = data.optimizeForChatGpt(),
+        val result = ArticleCurrentState(
+            data = data.optimizeForChatGpt(),
+            expectedOutcome = state.expectedOutcome,
             choices = options,
             feedback = feedback,
             choicesLeft = choicesLeft
         )
-        return Json.encodeToString(state)
+        return Json.encodeToString(result)
     }
 
     override fun refineData(state: ArticleState): Article {
-        return state.data.copy(
-            body = state.data.body.takeLast(Constants.MAX_BODY_SECTIONS_HISTORY),
-        )
+        return state.data
     }
 
     @Serializable
     data class ArticleCurrentState(
-        override val state: ArticleGptOptimized,
+        override val data: ArticleGptOptimized,
+        override val expectedOutcome: String,
         override val choices: List<Choice>,
         override val feedback: List<ModelFeedback>,
         override val choicesLeft: Int
