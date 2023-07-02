@@ -23,6 +23,7 @@ class ArticleChatGptPrompter @Inject constructor(
     override fun taskPrompt(): String {
         return """
         Write an article on the following topic: "${Constants.ARTICLE_TOPIC}".
+        Requirements:
         ${Constants.ARTICLE_REQUIREMENTS}
         """.trimIndent()
     }
@@ -30,7 +31,7 @@ class ArticleChatGptPrompter @Inject constructor(
     override fun example(): Pair<String, ChatGptReply> {
         val state = ArticleCurrentState(
             currentState = Article(
-                topic = "HTTP requests in Kotlin and",
+                topic = "HTTP requests in Kotlin using Kotlin Flows and Ktor.",
                 title = "[Android/Multiplatform] Kotlin Flows + Ktor = Flawless HTTP requests",
                 body = listOf()
             ),

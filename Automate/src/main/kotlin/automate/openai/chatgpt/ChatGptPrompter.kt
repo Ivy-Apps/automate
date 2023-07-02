@@ -50,11 +50,11 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 You receive:
                 - "currentState": the state of the task that you're completing.
                 - "choices": list of available choices with their input.
-                - "feedback": feedback to guide your next choice.
+                - "feedback": use feedback to fix errors and guide your next choice.
                 - "choicesLeft": the # of choices that you can make before finalizing the task.
                 
                 You must respond with:
-                - valid a JSON following the pattern
+                - a valid properly-escaped JSON following the pattern
                 - You must choose a choice from the "choices" list providing the "input" for the given choice.
                 """.normalizePrompt()
             )
@@ -67,9 +67,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 '''
                 ${taskPrompt()}
                 '''
-                by making the optimum number of choices until the task is achieved.
-                When ready you must finalize the goal with the "$FINALIZE_TAG" choices before
-                going out of choices, tracked by "choicesLeft".
+                by making choices until the task is done.
                 """.normalizePrompt()
             )
         )
