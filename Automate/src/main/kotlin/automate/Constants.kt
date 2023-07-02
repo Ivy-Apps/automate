@@ -4,15 +4,15 @@ import automate.openai.chatgpt.normalizePrompt
 
 object Constants {
     const val MODEL_LABEL =
-        "a Scrum and project manager experts that happens to be a lazy developer"
+        "a smart and lazy developer who hates Scrum"
     val ARTICLE_TOPIC = """
-Scrum explained for lazy developers that think it's bullshit.
+Why Scrum is stupid and it's wasting developers productivity.
 """.normalizePrompt()
     const val ARTICLE_TARGET_WORDS_COUNT = 1_000
     const val MIN_SECTIONS_COUNT = 3
 
     val ARTICLE_REQUIREMENTS = """
-1. Incorporate as many real-world code examples as possible. Ensure all code is properly formatted and escaped in the JSON.
+1. Incorporate as many real-world examples as possible.
 2. Avoid duplicating content in the article.
 3. Don't add content that's already in the "body".
 4. Aim for approx $ARTICLE_TARGET_WORDS_COUNT words.
