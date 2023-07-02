@@ -6,7 +6,6 @@ import automate.data.ModelFeedback.Error
 import automate.data.ModelFeedback.Suggestion
 import automate.domain.article.data.Article
 import automate.domain.article.data.BodyItem
-import automate.openai.chatgpt.ChatGptPrompter
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
@@ -14,17 +13,15 @@ import automate.statemachine.TransitionParam
 sealed class ArticleTransition : Transition<ArticleState, Article>()
 
 object SetTitleTransition : ArticleTransition() {
-    override val name = "Set the article title"
-    override val description = "Choose an engaging and relevant title."
+    override val name = "Set article title"
+    override val description = "Select an engaging title."
 
     val PARAM_TITLE = TransitionParam(
         name = "title",
-        description = "The title of the Article up to 100 chars",
+        description = "Up to 100 chars long article title.",
         tips = listOf(
             "Target length: around 60 chars.",
-            """
-            Use symbols like '[]', ':', '-' for better formatting.
-            """.trimIndent(),
+            "Use symbols like '[]', ':', '-' for better formatting.",
         ),
         type = String::class,
     )
@@ -43,15 +40,13 @@ object SetTitleTransition : ArticleTransition() {
 }
 
 object WriteIntroduction : ArticleTransition() {
-    override val name: String = "Write the introduction"
-    override val description: String = "Hook. Grab readers attention with a few short sentences."
+    override val name: String = "Compose the introduction"
+    override val description: String = "Hook the readers with concise and intriguing statements."
 
     private val PARAM_INTRODUCTION = TransitionParam(
         name = "introduction",
         type = String::class,
-        description = """
-            Prepare the reader for what they'll learn in this article in a fun and engaging way.
-        """.trimIndent(),
+        description = "Engage the reader by hinting at what they'll learn.",
         tips = listOf(
             "Keep it very short."
         ),
@@ -74,9 +69,8 @@ object WriteIntroduction : ArticleTransition() {
 }
 
 object AddSectionTransition : ArticleTransition() {
-    override val name = "Add an article section"
-    override val description =
-        "Represent a point in the article, each section has a title and consists of one or more paragraphs."
+    override val name = "Add a section"
+    override val description = "Create a point in the article with a title and one or more paragraphs."
 
     val PARAM_TITLE = TransitionParam(
         name = "title",
@@ -127,15 +121,13 @@ object AddSectionTransition : ArticleTransition() {
 }
 
 object AddImageTransition : ArticleTransition() {
-    override val name: String = "Add an image"
-    override val description = "Image prompt for an AI model so the reader isn't bored of just text."
+    override val name: String = "Generate an image"
+    override val description = "Provide an AI-generated image prompt to keep the reader engaged."
 
     private val PARAM_IMAGE_PROMPT = TransitionParam(
         name = "prompt",
         type = String::class,
-        description = """
-            A prompt that Dall-E will use to generate an image.
-        """.trimIndent(),
+        description = "A creative prompt for the AI to generate an image.",
         tips = listOf(
             "Be creative, make it unique.",
             "Use bold or abstract prompts",
@@ -160,20 +152,17 @@ object AddImageTransition : ArticleTransition() {
 }
 
 object WriteConclusionTransition : ArticleTransition() {
-    override val name: String = "${ChatGptPrompter.FINALIZE_TAG} Write a conclusion"
-    override val description = "Conclude the article with a few final sentences."
+    override val name: String = "Compose a conclusion"
+    override val description = "Wrap up the article with a summary or key takeaways."
 
     private val PARAM_CONCLUSION = TransitionParam(
         name = "conclusion",
         type = String::class,
-        description = """
-            Conclusion to summarize and finish the article.
-        """.trimIndent(),
+        description = "Summarize the article in the conclusion.",
         tips = null,
     )
 
     override val input: List<TransitionParam<*>> = listOf(PARAM_CONCLUSION)
-
 
     override fun transition(
         state: ArticleState,
