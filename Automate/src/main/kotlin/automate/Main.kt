@@ -33,20 +33,19 @@ class AutomateApp @Inject constructor(
                     val body = state.data.body
                     val sections = body.count { it is BodyItem.Section }
                     val images = body.count { it is BodyItem.Image }
-                    val articleLength = body.sumOf {
+                    val articleWords = body.sumOf {
                         when (it) {
                             is BodyItem.Image -> 0
-                            is BodyItem.Section -> it.text.length
+                            is BodyItem.Section -> it.text.split(" ").size
                         }
                     }
                     logger.debug(
-                        "--------------------------------------------------"
-                    )
-                    logger.debug(
                         """
+                            
+                        ------------------------------------------------------
                         Iteration #${++iteration}: 
                         ${articleStateMachine.errors} errors | $sections sections | $images images
-                        Article length: $articleLength chars.
+                        Article length: $articleWords words.
                     """.trimIndent()
                     )
                 }
