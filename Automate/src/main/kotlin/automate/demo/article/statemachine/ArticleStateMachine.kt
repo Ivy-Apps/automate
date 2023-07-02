@@ -1,5 +1,6 @@
 package automate.demo.article.statemachine
 
+import automate.Constants
 import automate.demo.article.Article
 import automate.demo.article.ai.ArticleChatGptPrompter
 import automate.statemachine.InputMap
@@ -10,8 +11,8 @@ class ArticleStateMachine @Inject constructor(
     private val articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.Initial,
-    maxErrors = 1,
-    maxSteps = 15,
+    maxErrors = Constants.MAX_ERRORS,
+    maxSteps = Constants.MAX_STEPS,
 ) {
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
         return when (state) {

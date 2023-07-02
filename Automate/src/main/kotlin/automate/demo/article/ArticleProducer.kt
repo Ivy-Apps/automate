@@ -1,6 +1,7 @@
 package automate.demo.article
 
 import java.io.File
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class ArticleProducer @Inject constructor() {
@@ -15,7 +16,7 @@ class ArticleProducer @Inject constructor() {
                 }
 
                 is BodyItem.Section -> {
-                    append("## ${item.title}")
+                    append("### ${item.title}")
                     append("\n")
                     append(item.text)
                     append("\n\n")
@@ -36,7 +37,7 @@ class ArticleProducer @Inject constructor() {
         articleTitle: String,
         content: String
     ) {
-        val pathname = "content/$articleTitle (${System.currentTimeMillis()}).md"
+        val pathname = "content/$articleTitle (${LocalDateTime.now()}).md"
         File(pathname).writeText(content)
         println("Article saved in '$pathname'.")
     }

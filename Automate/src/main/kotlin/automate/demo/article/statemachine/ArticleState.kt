@@ -1,12 +1,13 @@
 package automate.demo.article.statemachine
 
+import automate.Constants
 import automate.demo.article.Article
 import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
     object Initial : ArticleState {
         override val data = Article(
-            topic = "Using the ChatGPT API with Kotlin and Ktor",
+            topic = Constants.ARTICLE_TOPIC,
             title = "",
             body = emptyList()
         )
