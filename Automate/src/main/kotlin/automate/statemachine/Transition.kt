@@ -48,5 +48,4 @@ data class TransitionParam<T : Any>(
     val type: KClass<T>,
     val description: String? = null,
     val tips: List<String>? = null,
-    val optional: Boolean = false,
 )

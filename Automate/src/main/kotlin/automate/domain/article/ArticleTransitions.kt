@@ -15,12 +15,13 @@ sealed class ArticleTransition : Transition<ArticleState, Article>()
 
 object SetTitleTransition : ArticleTransition() {
     override val name = "Set the article title"
+    override val description = "Choose an engaging and relevant title."
 
     val PARAM_TITLE = TransitionParam(
-        name = "articleTitle",
+        name = "title",
         description = "The title of the Article up to 100 chars",
         tips = listOf(
-            "Make it as short as possible",
+            "Target length: around 60 chars.",
             """
             Use symbols like '[]', ':', '-' for better formatting.
             """.trimIndent(),
@@ -42,12 +43,13 @@ object SetTitleTransition : ArticleTransition() {
 }
 
 object AddSectionTransition : ArticleTransition() {
-    override val name: String = "Add a paragraph"
+    override val name = "Add an article section"
+    override val description =
+        "Represent a point in the article, each section has a title and consists of one or more paragraphs."
 
     val PARAM_TITLE = TransitionParam(
         name = "title",
-        description = "The title of the article paragraph.",
-        optional = false,
+        description = "The title of the article section.",
         type = String::class
     )
     val PARAM_TEXT = TransitionParam(
@@ -67,7 +69,7 @@ object AddSectionTransition : ArticleTransition() {
         state: ArticleState,
         input: InputMap
     ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
-        val title = optionalParamø(input, PARAM_TITLE)
+        val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
         val article = state.data
 
@@ -95,6 +97,7 @@ object AddSectionTransition : ArticleTransition() {
 
 object AddImageTransition : ArticleTransition() {
     override val name: String = "Add an image"
+    override val description = "An image"
 
     private val PARAM_IMAGE_PROMPT = TransitionParam(
         name = "prompt",
