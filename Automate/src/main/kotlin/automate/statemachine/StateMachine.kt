@@ -35,7 +35,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
         return prompter.prompt(
             state = state,
             feedback = feedback,
-            availableTransition = availableTransitions,
+            availableTransitions = availableTransitions,
             steps = steps,
             maxSteps = maxSteps,
         )

@@ -88,14 +88,14 @@ Continue by selecting appropriate options until the task is completed.
     suspend fun prompt(
         state: S,
         feedback: List<ModelFeedback>,
-        availableTransition: List<Trans>,
+        availableTransitions: List<Trans>,
         steps: Int,
         maxSteps: Int,
     ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> = catch({
         val prompt = currentStateAsJson(
             state = state,
             data = refineData(state),
-            options = availableTransition.toOptions(),
+            options = availableTransitions.toOptions(),
             feedback = feedback,
             choicesLeft = maxSteps - steps,
         )
@@ -108,9 +108,9 @@ Continue by selecting appropriate options until the task is completed.
         )
         val response = parseChatGptResponse(responseJson)
 
-        val optionIndex = response.choice.first().code - 'A'.code
+        val choiceIndex = choiceIndexWithFallback(response, availableTransitions)
         Either.Right(
-            availableTransition[optionIndex] to (response.input ?: emptyMap())
+            availableTransitions[choiceIndex] to (response.input ?: emptyMap())
         )
     }) {
         it.printStackTrace()
@@ -131,6 +131,21 @@ Continue by selecting appropriate options until the task is completed.
             } catch (e: Exception) {
                 // Remove duplicated '}'
                 Json.decodeFromString<ChatGptReply>(responseJson.dropLast(1))
+            }
+        }
+    }
+
+    private fun choiceIndexWithFallback(
+        response: ChatGptReply,
+        availableTransition: List<Trans>
+    ): Int {
+        return try {
+            response.choice.first().code - 'A'.code
+        } catch (e: Exception) {
+            if (availableTransition.size == 1) {
+                0
+            } else {
+                throw e
             }
         }
     }
