@@ -107,7 +107,7 @@ Continue by selecting appropriate options until the task is completed.
         )
         val response = parseChatGptResponse(responseJson)
 
-        val choiceIndex = response.choiceId
+        val choiceIndex = response.choiceId - 1
         val transition = try {
             availableTransitions[choiceIndex]
         } catch (e: IndexOutOfBoundsException) {

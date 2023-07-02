@@ -4,9 +4,9 @@ import automate.openai.chatgpt.normalizePrompt
 
 object Constants {
     const val MODEL_LABEL =
-        "an expert software architect and scientist specializing in computer science and software engineering"
+        "an expert frontend developer specializing in HTML and CSS"
     val ARTICLE_TOPIC = """
-Explain simply and concise the 5 OOP SOLID principles with good real-world and Kotlin examples.
+Learn HTML and CSS from real-world examples and build modern responsive UI.
 """.normalizePrompt()
     const val ARTICLE_TARGET_WORDS_COUNT = 2_000
     const val MIN_SECTIONS_COUNT = 4
