@@ -93,8 +93,7 @@ data class ArticleGptOptimized(
     val title: String,
     val topic: String,
     val sections: List<String>,
-    val images: List<String>,
-    val lastSection: BodyItem.Section?,
+    val body: List<BodyItem>,
 )
 
 private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
@@ -102,12 +101,6 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
         title = title,
         topic = topic,
         sections = sections(),
-        lastSection = null, //body.findLast { it is BodyItem.Section } as? BodyItem.Section,
-        images = body.mapNotNull {
-            when (it) {
-                is BodyItem.Image -> it.prompt
-                is BodyItem.Section -> null
-            }
-        },
+        body = body,
     )
 }
