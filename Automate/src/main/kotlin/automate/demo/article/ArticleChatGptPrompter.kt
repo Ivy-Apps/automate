@@ -34,7 +34,7 @@ class ArticleChatGptPrompter @Inject constructor(
                 title = "[Android/Multiplatform] Kotlin Flows + Ktor = Flawless HTTP requests",
                 body = listOf()
             ),
-            options = listOf(
+            choices = listOf(
                 AddImageTransition,
                 AddParagraphTransition,
             ).toOptions(),
@@ -42,7 +42,7 @@ class ArticleChatGptPrompter @Inject constructor(
             choicesLeft = 13,
         )
         val response = ChatGptReply(
-            option = "B",
+            choice = "B",
             input = mapOf(
                 AddParagraphTransition.PARAM_TITLE.name to "Introduction",
                 AddParagraphTransition.PARAM_TEXT.name to """
@@ -58,13 +58,13 @@ class ArticleChatGptPrompter @Inject constructor(
 
     override fun currentStateAsJson(
         data: Article,
-        options: List<Option>,
+        options: List<Choice>,
         feedback: List<ModelFeedback>,
         choicesLeft: Int
     ): String {
         val state = ArticleCurrentState(
             currentState = data,
-            options = options,
+            choices = options,
             feedback = feedback,
             choicesLeft = choicesLeft
         )
@@ -80,7 +80,7 @@ class ArticleChatGptPrompter @Inject constructor(
     @Serializable
     data class ArticleCurrentState(
         override val currentState: Article,
-        override val options: List<Option>,
+        override val choices: List<Choice>,
         override val feedback: List<ModelFeedback>,
         override val choicesLeft: Int
     ) : CurrentState<Article>

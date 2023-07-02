@@ -30,7 +30,8 @@ class AutomateApp @Inject constructor(
         scope.launch {
             withContext(Dispatchers.IO) {
                 articleStateMachine.state.collectLatest { state ->
-                    val body = state.data.body
+                    val article = state.data
+                    val body = article.body
                     val sections = body.count { it is BodyItem.Paragraph }
                     val images = body.count { it is BodyItem.Image }
                     val articleWords = body.sumOf {
@@ -44,6 +45,7 @@ class AutomateApp @Inject constructor(
                             
                         ------------------------------------------------------
                         Iteration #${++iteration}: 
+                        Title: "${article.title}"
                         ${articleStateMachine.errors} errors | $sections sections | $images images
                         Article length: $articleWords words.
                     """.trimIndent()

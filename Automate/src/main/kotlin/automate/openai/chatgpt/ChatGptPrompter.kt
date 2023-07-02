@@ -32,7 +32,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun currentStateAsJson(
         data: A,
-        options: List<Option>,
+        options: List<Choice>,
         feedback: List<ModelFeedback>,
         choicesLeft: Int,
     ): String
@@ -114,7 +114,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         )
 
         val response = Json.decodeFromString<ChatGptReply>(responseJson)
-        val optionIndex = response.option.first().code - 'A'.code
+        val optionIndex = response.choice.first().code - 'A'.code
         Either.Right(
             availableTransition[optionIndex] to (response.input ?: emptyMap())
         )
@@ -129,10 +129,10 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         )
     }
 
-    protected fun List<Trans>.toOptions(): List<Option> {
+    protected fun List<Trans>.toOptions(): List<Choice> {
         return mapIndexed { index, transition ->
-            Option(
-                key = ('A' + index).toString(),
+            Choice(
+                choice = ('A' + index).toString(),
                 title = transition.name,
                 description = transition.description,
                 input = transition.input.map { param ->
@@ -147,20 +147,20 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     @Serializable
     data class ChatGptReply(
-        val option: String,
+        val choice: String,
         val input: Map<String, String>? = null
     )
 
     interface CurrentState<A> {
         val currentState: A
-        val options: List<Option>
+        val choices: List<Choice>
         val feedback: List<ModelFeedback>
         val choicesLeft: Int
     }
 
     @Serializable
-    data class Option(
-        val key: String,
+    data class Choice(
+        val choice: String,
         val title: String,
         val description: String?,
         val input: List<InputParameter>? = null
