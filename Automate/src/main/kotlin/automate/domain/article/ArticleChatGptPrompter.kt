@@ -114,7 +114,7 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
         title = title,
         topic = topic,
         currentWords = wordsCount(),
-        targetWords = Constants.ARTICLE_WORDS_COUNT,
+        targetWords = Constants.ARTICLE_TARGET_WORDS_COUNT,
         introduction = introduction,
         sectionsTitles = sectionsTitles(),
         body = body,

@@ -28,10 +28,14 @@ class ArticleStateMachine @Inject constructor(
             }
 
             is ArticleState.WriteBody -> {
-                buildList {
-                    add(AddSectionTransition)
-                    if (article.sectionsTitles().size >= Constants.MIN_SECTIONS_COUNT) {
-                        add(WriteConclusionTransition)
+                if (article.wordsCount() > Constants.ARTICLE_TARGET_WORDS_COUNT + 200) {
+                    listOf(WriteConclusionTransition)
+                } else {
+                    buildList {
+                        add(AddSectionTransition)
+                        if (article.sectionsTitles().size >= Constants.MIN_SECTIONS_COUNT) {
+                            add(WriteConclusionTransition)
+                        }
                     }
                 }
             }
