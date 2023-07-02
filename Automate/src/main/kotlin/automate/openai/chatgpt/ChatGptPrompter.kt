@@ -115,7 +115,7 @@ Continue by selecting appropriate options until the task is completed.
         it.printStackTrace()
         Either.Left(
             ModelFeedback.Error(
-                feedback = "Exception: $it."
+                feedback = "$it"
             )
         )
     }
@@ -141,11 +141,7 @@ Continue by selecting appropriate options until the task is completed.
         return try {
             response.choice.first().code - 'A'.code
         } catch (e: Exception) {
-            if (availableTransition.size == 1) {
-                0
-            } else {
-                throw e
-            }
+            0
         }
     }
 

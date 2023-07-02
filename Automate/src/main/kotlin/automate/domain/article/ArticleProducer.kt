@@ -38,7 +38,7 @@ class ArticleProducer @Inject constructor() {
         articleTitle: String,
         content: String
     ) {
-        val pathname = "content/$[${LocalDateTime.now()}] ${articleTitle}.md"
+        val pathname = "content/[${LocalDateTime.now()}] ${articleTitle}.md"
         File(pathname).writeText(content)
         println("Article saved in '$pathname'.")
     }

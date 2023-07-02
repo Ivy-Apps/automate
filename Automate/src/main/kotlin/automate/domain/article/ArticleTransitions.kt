@@ -87,8 +87,8 @@ object AddSectionTransition : ArticleTransition() {
         type = String::class,
         tips = listOf(
             "Supports Markdown.",
+            "Do NOT repeat the \"introduction\"!",
             "Code examples are a must!",
-            "Keep it short, straightforward and fun."
         )
     )
 
