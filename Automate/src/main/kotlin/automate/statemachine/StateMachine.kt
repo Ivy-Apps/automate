@@ -83,7 +83,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
         ) {
             is Either.Left -> {
                 feedback += res.value
-                ++errors
+                errors++
                 run()
                 return
             }
