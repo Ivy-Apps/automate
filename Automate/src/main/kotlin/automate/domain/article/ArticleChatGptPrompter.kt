@@ -31,7 +31,7 @@ class ArticleChatGptPrompter @Inject constructor(
 
     override fun example(): Pair<String, ChatGptReply> {
         val state = ArticleCurrentState(
-            currentState = Article(
+            state = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
                 title = "",
                 body = listOf()
@@ -60,7 +60,7 @@ class ArticleChatGptPrompter @Inject constructor(
         choicesLeft: Int
     ): String {
         val state = ArticleCurrentState(
-            currentState = data,
+            state = data,
             choices = options,
             feedback = feedback,
             choicesLeft = choicesLeft
@@ -76,7 +76,7 @@ class ArticleChatGptPrompter @Inject constructor(
 
     @Serializable
     data class ArticleCurrentState(
-        override val currentState: Article,
+        override val state: Article,
         override val choices: List<Choice>,
         override val feedback: List<ModelFeedback>,
         override val choicesLeft: Int

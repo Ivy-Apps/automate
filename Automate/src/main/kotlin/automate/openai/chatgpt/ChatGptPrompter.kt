@@ -48,7 +48,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 content = """
                 You're ${aLabel()} and a pattern-following assistant that communicates using JSON.
                 You receive:
-                - "currentState": the state of the task that you're completing.
+                - "state": the state of the task that you're completing.
                 - "choices": list of available choices with their input.
                 - "feedback": use feedback to fix errors and guide your next choice.
                 - "choicesLeft": the # of choices that you can make before finalizing the task.
@@ -150,7 +150,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     )
 
     interface CurrentState<A> {
-        val currentState: A
+        val state: A
         val choices: List<Choice>
         val feedback: List<ModelFeedback>
         val choicesLeft: Int
