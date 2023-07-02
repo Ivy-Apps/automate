@@ -8,10 +8,12 @@ object Constants {
     val ARTICLE_TOPIC = """
 Jetpack Compose states for beginners with practical examples.
 """.normalizePrompt()
+    const val ARTICLE_WORDS_COUNT = 1_000
     val ARTICLE_REQUIREMENTS = """
 1. Incorporate as many real-world code examples as possible. Ensure all code is properly formatted and escaped in the JSON.
 2. Avoid duplicating content in the article.
 3. Don't add content that's already in the "body".
+4. Aim for approx $ARTICLE_WORDS_COUNT words.
 """.normalizePrompt()
 
     const val MIN_SECTIONS_COUNT = 3

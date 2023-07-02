@@ -46,7 +46,6 @@ You'll receive:
 - "article": The current state of the article.
 - "choices": A set of options each having its own specific input.
 - "feedback": Instructions to rectify errors and make better future decisions.
-- "choicesLeft": The count of remaining choices before completing the task.
 
 Make sure to:
 - Adhere to valid JSON formatting rules and ensure proper escaping.
@@ -171,14 +170,6 @@ Continue by selecting appropriate options until the task is completed.
         val choice: String,
         val input: Map<String, String>? = null
     )
-
-    interface CurrentState<A> {
-        val article: A
-        val expectedOutcome: String
-        val choices: List<Choice>
-        val feedback: List<String>
-        val choicesLeft: Int
-    }
 
     @Serializable
     data class Choice(

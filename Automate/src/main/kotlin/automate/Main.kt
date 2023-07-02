@@ -35,11 +35,7 @@ class AutomateApp @Inject constructor(
                     val article = state.data
                     val body = article.body
                     val sections = body.count { it is BodyItem.Section }
-                    val articleWords = article.introduction.wordsCount() + body.sumOf {
-                        when (it) {
-                            is BodyItem.Section -> it.text.wordsCount()
-                        }
-                    } + article.conclusion.wordsCount()
+                    val articleWords = article.wordsCount()
                     logger.debug(
                         """
     

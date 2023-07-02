@@ -31,7 +31,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
     }
 
     override fun example(): Pair<String, ChatGptReply> {
-        val state = ArticleCurrentState(
+        val state = StateGptOptimized(
             article = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
                 introduction = "",
@@ -45,7 +45,6 @@ ${Constants.ARTICLE_REQUIREMENTS}
                 AddSectionTransition,
             ).toOptions(),
             feedback = listOf(),
-            choicesLeft = 13,
         )
         val response = ChatGptReply(
             choice = "A",
@@ -64,7 +63,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
         feedback: List<ModelFeedback>,
         choicesLeft: Int
     ): String {
-        val result = ArticleCurrentState(
+        val result = StateGptOptimized(
             article = data.optimizeForChatGpt(),
             expectedOutcome = state.expectedOutcome,
             choices = options,
@@ -82,7 +81,6 @@ ${Constants.ARTICLE_REQUIREMENTS}
                     append(it.feedback)
                 }
             },
-            choicesLeft = choicesLeft
         )
         return Json.encodeToString(result)
     }
@@ -92,19 +90,20 @@ ${Constants.ARTICLE_REQUIREMENTS}
     }
 
     @Serializable
-    data class ArticleCurrentState(
-        override val article: ArticleGptOptimized,
-        override val expectedOutcome: String,
-        override val choices: List<Choice>,
-        override val feedback: List<String>,
-        override val choicesLeft: Int
-    ) : CurrentState<ArticleGptOptimized>
+    data class StateGptOptimized(
+        val choices: List<Choice>,
+        val expectedOutcome: String,
+        val feedback: List<String>,
+        val article: ArticleGptOptimized,
+    )
 }
 
 @Serializable
 data class ArticleGptOptimized(
     val title: String,
     val topic: String,
+    val currentWords: Int,
+    val targetWords: Int,
     val introduction: String,
     val sectionsTitles: List<String>,
     val body: List<BodyItem>,
@@ -114,6 +113,8 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
     return ArticleGptOptimized(
         title = title,
         topic = topic,
+        currentWords = wordsCount(),
+        targetWords = Constants.ARTICLE_WORDS_COUNT,
         introduction = introduction,
         sectionsTitles = sectionsTitles(),
         body = body,
