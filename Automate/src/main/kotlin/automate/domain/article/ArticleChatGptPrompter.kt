@@ -5,6 +5,7 @@ import automate.data.ModelFeedback
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.domain.article.data.Article
+import automate.domain.article.data.BodyItem
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.network.ChatGptService
 import automate.openai.chatgpt.normalizePrompt
@@ -33,9 +34,11 @@ class ArticleChatGptPrompter @Inject constructor(
         val state = ArticleCurrentState(
             state = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
+                introduction = "",
                 title = "",
-                body = listOf()
-            ),
+                body = listOf(),
+                conclusion = "",
+            ).optimizeForChatGpt(),
             choices = listOf(
                 SetTitleTransition,
                 AddSectionTransition,
@@ -60,7 +63,7 @@ class ArticleChatGptPrompter @Inject constructor(
         choicesLeft: Int
     ): String {
         val state = ArticleCurrentState(
-            state = data,
+            state = data.optimizeForChatGpt(),
             choices = options,
             feedback = feedback,
             choicesLeft = choicesLeft
@@ -76,9 +79,36 @@ class ArticleChatGptPrompter @Inject constructor(
 
     @Serializable
     data class ArticleCurrentState(
-        override val state: Article,
+        override val state: ArticleGptOptimized,
         override val choices: List<Choice>,
         override val feedback: List<ModelFeedback>,
         override val choicesLeft: Int
-    ) : CurrentState<Article>
+    ) : CurrentState<ArticleGptOptimized>
+}
+
+@Serializable
+data class ArticleGptOptimized(
+    val title: String,
+    val sections: List<String>,
+    val imagePrompts: List<String>,
+    val lastSection: BodyItem.Section?,
+)
+
+private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
+    return ArticleGptOptimized(
+        title = title,
+        sections = body.mapNotNull {
+            when (it) {
+                is BodyItem.Image -> null
+                is BodyItem.Section -> it.title
+            }
+        },
+        lastSection = body.findLast { it is BodyItem.Section } as? BodyItem.Section,
+        imagePrompts = body.mapNotNull {
+            when (it) {
+                is BodyItem.Image -> it.prompt
+                is BodyItem.Section -> null
+            }
+        },
+    )
 }

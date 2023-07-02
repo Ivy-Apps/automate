@@ -32,12 +32,12 @@ class AutomateApp @Inject constructor(
                 articleStateMachine.state.collectLatest { state ->
                     val article = state.data
                     val body = article.body
-                    val sections = body.count { it is BodyItem.Paragraph }
+                    val sections = body.count { it is BodyItem.Section }
                     val images = body.count { it is BodyItem.Image }
                     val articleWords = body.sumOf {
                         when (it) {
                             is BodyItem.Image -> 0
-                            is BodyItem.Paragraph -> it.text.split(" ").size
+                            is BodyItem.Section -> it.text.split(" ").size
                         }
                     }
                     logger.debug(

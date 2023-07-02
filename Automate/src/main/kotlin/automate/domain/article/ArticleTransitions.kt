@@ -53,7 +53,7 @@ object AddSectionTransition : ArticleTransition() {
         type = String::class
     )
     val PARAM_TEXT = TransitionParam(
-        name = "body",
+        name = "text",
         description = "The text of the article paragraph.",
         type = String::class,
         tips = listOf(
@@ -74,7 +74,7 @@ object AddSectionTransition : ArticleTransition() {
         val article = state.data
 
         val duplicatedSection = article.body.any {
-            (it as? BodyItem.Paragraph)?.title?.equals(title, ignoreCase = true) == true
+            (it as? BodyItem.Section)?.title?.equals(title, ignoreCase = true) == true
         }
         if (duplicatedSection) {
             raise(
@@ -86,7 +86,7 @@ object AddSectionTransition : ArticleTransition() {
             )
         }
 
-        val section = BodyItem.Paragraph(title = title, text = text)
+        val section = BodyItem.Section(title = title, text = text)
         ArticleState.Writing(
             data = article.copy(
                 body = article.body + section

@@ -46,7 +46,7 @@ class ArticleStateMachine @Inject constructor(
         var count = 0
         var index = size - 1
         while (count < n) {
-            if (getOrNull(index) !is BodyItem.Paragraph) return false
+            if (getOrNull(index) !is BodyItem.Section) return false
             count++
             index--
         }

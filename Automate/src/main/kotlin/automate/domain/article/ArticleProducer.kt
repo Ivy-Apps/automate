@@ -17,7 +17,7 @@ class ArticleProducer @Inject constructor() {
                     append("]**\n\n\n")
                 }
 
-                is BodyItem.Paragraph -> {
+                is BodyItem.Section -> {
                     if (item.title != null) {
                         append("### ${item.title}")
                         append("\n")

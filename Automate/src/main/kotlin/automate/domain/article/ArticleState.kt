@@ -9,7 +9,9 @@ sealed interface ArticleState : State<Article> {
         override val data = Article(
             topic = Constants.ARTICLE_TOPIC,
             title = "",
-            body = emptyList()
+            introduction = "",
+            body = emptyList(),
+            conclusion = "",
         )
     }
 

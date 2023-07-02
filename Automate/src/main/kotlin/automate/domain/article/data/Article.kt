@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
 data class Article(
     val topic: String,
     val title: String,
-    val body: List<BodyItem>
+    val introduction: String,
+    val body: List<BodyItem>,
+    val conclusion: String,
 )
 
 @Serializable
@@ -16,5 +18,5 @@ sealed interface BodyItem {
     data class Image(val prompt: String) : BodyItem
 
     @Serializable
-    data class Paragraph(val title: String?, val text: String) : BodyItem
+    data class Section(val title: String, val text: String) : BodyItem
 }
