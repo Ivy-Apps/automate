@@ -44,7 +44,7 @@ Iteration #${iteration++}:
 Title: "${article.title}"
 Introduction: ${article.introduction.wordsCount()} words.
 Sections:
-${article.sectionsTitles().joinToString(separator = "\n-")}
+-${article.sectionsTitles().joinToString(separator = "\n-")}
 $sections sections | ${stateMachine.activeErrors()} active errors | ${stateMachine.errorsOccurred} total errors
 Article length: $articleWords words.
 """.trimIndent()

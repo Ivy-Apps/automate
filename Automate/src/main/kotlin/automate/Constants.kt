@@ -6,10 +6,10 @@ object Constants {
     const val MODEL_LABEL =
         "an expert technical writer specializing in Android, Kotlin, Jetpack Compose and the latest trends in software development"
     val ARTICLE_TOPIC = """
-Jetpack Compose states for beginners with practical examples.
+Learn Jetpack Compose by example for Junior Android Developers, everything they need to know.
 """.normalizePrompt()
-    const val ARTICLE_TARGET_WORDS_COUNT = 1_000
-    const val MIN_SECTIONS_COUNT = 3
+    const val ARTICLE_TARGET_WORDS_COUNT = 2_000
+    const val MIN_SECTIONS_COUNT = 4
 
     val ARTICLE_REQUIREMENTS = """
 1. Incorporate as many real-world code examples as possible. Ensure all code is properly formatted and escaped in the JSON.
