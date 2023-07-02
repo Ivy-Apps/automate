@@ -34,10 +34,8 @@ class AutomateApp @Inject constructor(
                     val article = state.data
                     val body = article.body
                     val sections = body.count { it is BodyItem.Section }
-                    val images = body.count { it is BodyItem.Image }
                     val articleWords = article.introduction.wordsCount() + body.sumOf {
                         when (it) {
-                            is BodyItem.Image -> 0
                             is BodyItem.Section -> it.text.wordsCount()
                         }
                     } + article.conclusion.wordsCount()
@@ -48,7 +46,7 @@ class AutomateApp @Inject constructor(
 Iteration #${iteration++}: 
 Title: "${article.title}"
 Introduction: ${article.introduction.wordsCount()} words.
-$sections sections | $images images | ${stateMachine.activeErrors()} errors | ${stateMachine.errorsOccurred} total errors
+$sections sections | ${stateMachine.activeErrors()} active errors | ${stateMachine.errorsOccurred} total errors
 Article length: $articleWords words.
 """.trimIndent()
                     )

@@ -176,7 +176,7 @@ Continue by selecting appropriate options until the task is completed.
         val data: A
         val expectedOutcome: String
         val choices: List<Choice>
-        val feedback: List<ModelFeedback>
+        val feedback: List<String>
         val choicesLeft: Int
     }
 

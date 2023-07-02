@@ -108,11 +108,7 @@ object AddSectionTransition : ArticleTransition() {
         }
         if (duplicatedSection) {
             raise(
-                Error(
-                    """
-                    Error: Duplicated paragraph '$title' in $sections.
-                """.trimIndent()
-                )
+                Error("Don't create a '$title' section!")
             )
         }
 

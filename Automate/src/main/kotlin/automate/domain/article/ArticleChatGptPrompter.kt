@@ -68,7 +68,20 @@ ${Constants.ARTICLE_REQUIREMENTS}
             data = data.optimizeForChatGpt(),
             expectedOutcome = state.expectedOutcome,
             choices = options,
-            feedback = feedback,
+            feedback = feedback.map {
+                buildString {
+                    append('[')
+                    append(
+                        when (it) {
+                            is ModelFeedback.Error -> "ERROR"
+                            is ModelFeedback.FatalError -> "FATAL ERROR"
+                            is ModelFeedback.Suggestion -> "Suggestion"
+                        }
+                    )
+                    append("] ")
+                    append(it.feedback)
+                }
+            },
             choicesLeft = choicesLeft
         )
         return Json.encodeToString(result)
@@ -83,7 +96,7 @@ ${Constants.ARTICLE_REQUIREMENTS}
         override val data: ArticleGptOptimized,
         override val expectedOutcome: String,
         override val choices: List<Choice>,
-        override val feedback: List<ModelFeedback>,
+        override val feedback: List<String>,
         override val choicesLeft: Int
     ) : CurrentState<ArticleGptOptimized>
 }

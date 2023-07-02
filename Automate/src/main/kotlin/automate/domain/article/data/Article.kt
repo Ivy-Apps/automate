@@ -2,7 +2,6 @@ package automate.domain.article.data
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data class Article(
     val topic: String,
@@ -14,9 +13,6 @@ data class Article(
 
 @Serializable
 sealed interface BodyItem {
-    @Serializable
-    data class Image(val prompt: String) : BodyItem
-
     @Serializable
     data class Section(val title: String, val text: String) : BodyItem
 }

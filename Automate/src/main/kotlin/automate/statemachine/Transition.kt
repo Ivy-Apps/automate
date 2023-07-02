@@ -28,7 +28,7 @@ abstract class Transition<S : State<A>, A> {
         ensureNotNull(value) {
             ModelFeedback.Error(
                 """
-                Value for parameter '${param.name}' not found in the "input" map.
+                Input parameter '${param.name}' must be present in: $inputMap.
                 """.trimIndent()
             )
         }
@@ -36,7 +36,7 @@ abstract class Transition<S : State<A>, A> {
     }
 
     @StateMachineDslMarker
-    protected inline fun <reified T : Any> Raise<ModelFeedback.Error>.optionalParamø(
+    protected inline fun <reified T : Any> optionalParamø(
         inputMap: InputMap,
         param: TransitionParam<T>
     ): T? = inputMap[param.name] as? T
