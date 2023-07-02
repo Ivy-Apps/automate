@@ -1,0 +1,4 @@
+package automate.statemachine
+
+@DslMarker
+annotation class StateMachineDslMarker

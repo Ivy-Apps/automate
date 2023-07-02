@@ -3,6 +3,7 @@ package automate.statemachine
 import arrow.core.Either
 import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
+import automate.data.ModelFeedback
 import kotlin.reflect.KClass
 
 typealias InputMap = Map<String, Any>
@@ -12,19 +13,24 @@ abstract class Transition<S : State<A>, A> {
     open val description: String? = null
 
     abstract val input: List<TransitionParam<*>>
-    abstract fun transition(state: S, input: InputMap): Either<String, S>
+    abstract fun transition(
+        state: S,
+        input: InputMap
+    ): Either<ModelFeedback.Error, Pair<S, List<ModelFeedback.Suggestion>>>
 
-    @StateMachineDsl
-    protected inline fun <reified T : Any> Raise<String>.requiredParam(
+    @StateMachineDslMarker
+    protected inline fun <reified T : Any> Raise<ModelFeedback.Error>.requiredParam(
         inputMap: InputMap,
         param: TransitionParam<T>
     ): T {
         val value = inputMap[param.name] as? T
         ensureNotNull(value) {
-            """
+            ModelFeedback.Error(
+                """
                 Value for parameter "${param.name}" with type '${param.type.simpleName}'
                 was not found in map: $inputMap.
-            """.trimIndent()
+                """.trimIndent()
+            )
         }
         return value
     }

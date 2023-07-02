@@ -1,5 +1,8 @@
 package automate.openai.chatgpt
 
+import automate.openai.chatgpt.network.ChatGptMessage
+import automate.openai.chatgpt.network.ChatGptRole
+import automate.openai.chatgpt.network.ChatGptService
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition

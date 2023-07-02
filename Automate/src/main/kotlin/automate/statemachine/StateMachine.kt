@@ -1,11 +1,9 @@
 package automate.statemachine
 
 import arrow.core.Either
+import automate.data.ModelFeedback
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-
-@DslMarker
-annotation class StateMachineDsl
 
 abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     initialState: S,
@@ -17,33 +15,33 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
 
     private var steps = 0
     private var errors = 0
-    private var error: String? = null
+    private var feedback: List<ModelFeedback> = listOf()
 
     abstract fun availableTransitions(state: S): List<Trans>
 
     abstract suspend fun nextTransition(
         state: S,
         availableTransitions: List<Trans>,
-        error: String?,
+        feedback: List<ModelFeedback>,
     ): Pair<Trans, InputMap>
 
-    open suspend fun onFinished(state: S, error: String?) {}
+    open suspend fun onFinished(state: S, feedback: List<ModelFeedback>) {}
 
-    tailrec suspend fun run() {
+    suspend fun run() {
         if (++steps >= maxSteps) {
-            error = "Max steps reached! Reached $steps."
-            onFinished(state.value, error)
+            feedback += ModelFeedback.FatalError("Max steps reached! Reached $steps steps.")
+            onFinished(state.value, feedback)
             return
         }
         if (state.value.isFinal) {
-            onFinished(state.value, error)
+            onFinished(state.value, feedback)
             return
         }
 
         val (transition, input) = nextTransition(
             state = state.value,
             availableTransitions = availableTransitions(state.value),
-            error = error,
+            feedback = feedback,
         )
         when (
             val res = transition.transition(
@@ -52,26 +50,27 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
             )
         ) {
             is Either.Left -> {
-                error = res.value
+                feedback += res.value
                 if (++errors < maxErrors) {
                     run()
                 } else {
-                    onFinished(state.value, error)
+                    feedback += ModelFeedback.FatalError("Max errors reached! Reached $errors errors.")
+                    onFinished(state.value, feedback)
                     return
                 }
             }
 
             is Either.Right -> {
-                error = null
-                internalState.value = res.value
+                val (state, suggestions) = res.value
+                feedback = feedback.map {
+                    when (it) {
+                        is ModelFeedback.Error -> it.copy(resolved = true)
+                        else -> it
+                    }
+                } + suggestions
+                internalState.value = state
                 run()
             }
         }
     }
-}
-
-interface State<A> {
-    val data: A
-    val isFinal: Boolean
-        get() = false
 }

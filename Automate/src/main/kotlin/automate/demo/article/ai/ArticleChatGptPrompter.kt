@@ -6,7 +6,7 @@ import automate.demo.article.statemachine.ArticleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.openai.chatgpt.ChatGptPrompter
-import automate.openai.chatgpt.ChatGptService
+import automate.openai.chatgpt.network.ChatGptService
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

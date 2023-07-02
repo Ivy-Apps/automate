@@ -1,4 +1,4 @@
-package automate.openai.chatgpt
+package automate.openai.chatgpt.network
 
 import automate.KtorClient
 import automate.di.AppScope
