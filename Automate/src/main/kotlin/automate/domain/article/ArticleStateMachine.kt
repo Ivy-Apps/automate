@@ -2,7 +2,6 @@ package automate.domain.article
 
 import automate.Constants
 import automate.domain.article.data.Article
-import automate.domain.article.data.BodyItem
 import automate.statemachine.StateMachine
 import javax.inject.Inject
 
@@ -27,16 +26,9 @@ class ArticleStateMachine @Inject constructor(
                 listOf(WriteIntroduction)
             }
 
-            is ArticleState.AddedImage -> {
-                listOf(AddSectionTransition)
-            }
-
             is ArticleState.WriteBody -> {
                 buildList {
-                    add(AddImageTransition)
-                    if (!body.lastNAreParagraphs(4)) {
-                        add(AddSectionTransition)
-                    }
+                    add(AddSectionTransition)
                     if (body.size > 5) {
                         add(WriteConclusionTransition)
                     }
@@ -48,16 +40,4 @@ class ArticleStateMachine @Inject constructor(
             }
         }
     }
-
-    private fun List<BodyItem>.lastNAreParagraphs(n: Int): Boolean {
-        var count = 0
-        var index = size - 1
-        while (count < n) {
-            if (getOrNull(index) !is BodyItem.Section) return false
-            count++
-            index--
-        }
-        return true
-    }
-
 }

@@ -125,36 +125,6 @@ object AddSectionTransition : ArticleTransition() {
     }
 }
 
-object AddImageTransition : ArticleTransition() {
-    override val name: String = "Generate an image"
-    override val description = "Provide an AI-generated image prompt to keep the reader engaged."
-
-    private val PARAM_IMAGE_PROMPT = TransitionParam(
-        name = "prompt",
-        type = String::class,
-        description = "A creative prompt for the AI to generate an image.",
-        tips = listOf(
-            "Use bold or abstract prompts",
-            "The image must be fun!",
-        )
-    )
-
-    override val input = listOf(PARAM_IMAGE_PROMPT)
-
-    override fun transition(
-        state: ArticleState,
-        input: InputMap
-    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
-        val imagePrompt = requiredParam(input, PARAM_IMAGE_PROMPT)
-        val article = state.data
-        ArticleState.AddedImage(
-            data = article.copy(
-                body = article.body + BodyItem.Image(prompt = imagePrompt)
-            )
-        ) to emptyList()
-    }
-}
-
 object WriteConclusionTransition : ArticleTransition() {
     override val name: String = "Compose a conclusion"
     override val description = "Wrap up the article with a summary or key takeaways."

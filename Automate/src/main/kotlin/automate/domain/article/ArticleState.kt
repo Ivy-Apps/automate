@@ -28,12 +28,6 @@ sealed interface ArticleState : State<Article> {
         override val expectedOutcome = "writeBody"
     }
 
-    data class AddedImage(
-        override val data: Article
-    ) : ArticleState {
-        override val expectedOutcome = "writeSection"
-    }
-
     data class Conclusion(
         override val data: Article
     ) : ArticleState {
