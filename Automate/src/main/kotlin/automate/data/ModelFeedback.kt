@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 sealed interface ModelFeedback {
-    val type: String
+    val feedbackType: String
     val description: String
     val feedback: String
 
@@ -12,7 +12,7 @@ sealed interface ModelFeedback {
     data class FatalError(
         override val feedback: String,
     ) : ModelFeedback {
-        override val type = "FATAL_ERROR"
+        override val feedbackType = "FATAL_ERROR"
         override val description = "An error that immediately terminates the program execution."
     }
 
@@ -21,7 +21,7 @@ sealed interface ModelFeedback {
         override val feedback: String,
         val resolved: Boolean = false,
     ) : ModelFeedback {
-        override val type = "ERROR"
+        override val feedbackType = "ERROR"
         override val description = """
             Errors are of highest importance that must be fixed immediately!
             The "resolved" boolean will indicate whether they are fixed.
@@ -32,7 +32,7 @@ sealed interface ModelFeedback {
     data class Suggestion(
         override val feedback: String
     ) : ModelFeedback {
-        override val type = "SUGGESTION"
+        override val feedbackType = "SUGGESTION"
         override val description = "Suggestions are of lower priority and should be considered only for next prompts."
     }
 }

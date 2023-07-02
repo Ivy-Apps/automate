@@ -1,11 +1,15 @@
 package automate.demo.article
 
 import automate.Constants
+import automate.data.ModelFeedback
 import automate.demo.article.data.Article
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.network.ChatGptService
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
@@ -31,8 +35,8 @@ class ArticleChatGptPrompter @Inject constructor(
         """.trimIndent()
     }
 
-    override fun example(): Pair<CurrentState<Article>, ChatGptReply> {
-        val state = CurrentState(
+    override fun example(): Pair<String, ChatGptReply> {
+        val state = ArticleCurrentState(
             currentState = Article(
                 topic = "HTTP requests in Kotlin and",
                 title = "[Android/Multiplatform] Kotlin Flows + Ktor = Flawless HTTP requests",
@@ -57,6 +61,29 @@ class ArticleChatGptPrompter @Inject constructor(
             )
         )
 
-        return state to response
+        return Json.encodeToString(state) to response
     }
+
+    override fun currentStateAsJson(
+        currentState: ArticleState,
+        options: List<Option>,
+        feedback: List<ModelFeedback>,
+        choicesLeft: Int
+    ): String {
+        val state = ArticleCurrentState(
+            currentState = currentState.data,
+            options = options,
+            feedback = feedback,
+            choicesLeft = choicesLeft
+        )
+        return Json.encodeToString(state)
+    }
+
+    @Serializable
+    data class ArticleCurrentState(
+        override val currentState: Article,
+        override val options: List<Option>,
+        override val feedback: List<ModelFeedback>,
+        override val choicesLeft: Int
+    ) : CurrentState<Article>
 }

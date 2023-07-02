@@ -28,7 +28,14 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun taskPrompt(): String
 
-    protected abstract fun example(): Pair<CurrentState<A>, ChatGptReply>
+    protected abstract fun example(): Pair<String, ChatGptReply>
+
+    protected abstract fun currentStateAsJson(
+        currentState: S,
+        options: List<Option>,
+        feedback: List<ModelFeedback>,
+        choicesLeft: Int,
+    ): String
 
 
     private fun modelContext(
@@ -65,13 +72,13 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
             )
         )
 
-        val (exampleState, exampleResponse) = example()
+        val (exampleStateJson, exampleResponse) = example()
 
         add(
             ChatGptMessage(
                 role = ChatGptRole.System,
                 name = "example_user",
-                content = Json.encodeToString(exampleState)
+                content = exampleStateJson,
             )
         )
         add(
@@ -90,13 +97,12 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         steps: Int,
         maxSteps: Int,
     ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> = catch({
-        val currentState = CurrentState(
+        val prompt = currentStateAsJson(
             currentState = state,
             options = availableTransition.toOptions(),
             feedback = feedback,
             choicesLeft = maxSteps - steps,
         )
-        val prompt = Json.encodeToString(currentState)
 
         val responseJson = chatGptService.prompt(
             conversation = modelContext() + ChatGptMessage(
@@ -143,13 +149,12 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         val input: Map<String, String>? = null
     )
 
-    @Serializable
-    data class CurrentState<A>(
-        val currentState: A,
-        val options: List<Option>,
-        val feedback: List<ModelFeedback>,
-        val choicesLeft: Int,
-    )
+    interface CurrentState<A> {
+        val currentState: A
+        val options: List<Option>
+        val feedback: List<ModelFeedback>
+        val choicesLeft: Int
+    }
 
     @Serializable
     data class Option(
