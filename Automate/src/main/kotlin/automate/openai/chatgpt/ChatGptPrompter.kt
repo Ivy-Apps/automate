@@ -46,17 +46,17 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
             ChatGptMessage(
                 role = ChatGptRole.System,
                 content = """
-                You're ${aLabel()} and a pattern-following assistant that communicates using JSON.
-                You receive:
-                - "state": the state of the task that you're completing.
-                - "choices": list of available choices with their input.
-                - "feedback": use feedback to fix errors and guide your next choice.
-                - "choicesLeft": the # of choices that you can make before finalizing the task.
-                
-                You must respond with:
-                - a valid properly-escaped JSON following the pattern
-                - You must choose a choice from the "choices" list providing the "input" for the given choice.
-                """.normalizePrompt()
+You are ${aLabel()} and a pattern-adhering assistant that interacts through JSON. 
+What you receive:
+- "state": Represents the current status of the task you're executing.
+- "choices": A list of options available to you, each with its corresponding input.
+- "feedback": Instructions for correcting errors and guiding your upcoming decisions.
+- "choicesLeft": The number of choices you can make before finalizing the task.
+
+Your response should:
+- Comply with the correct JSON formatting rules and be properly escaped.
+- Include a selection from the "choices" list, providing the necessary "input" for the selected choice.
+""".normalizePrompt()
             )
         )
         add(
