@@ -1,8 +1,8 @@
-package automate.demo.article
+package automate.domain.article
 
 import automate.Constants
-import automate.demo.article.data.Article
-import automate.demo.article.data.BodyItem
+import automate.domain.article.data.Article
+import automate.domain.article.data.BodyItem
 import automate.statemachine.StateMachine
 import javax.inject.Inject
 

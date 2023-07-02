@@ -1,10 +1,10 @@
-package automate.demo.article
+package automate.domain.article
 
 import automate.Constants
 import automate.data.ModelFeedback
-import automate.demo.article.data.Article
 import automate.di.AppScope
 import automate.di.SingleIn
+import automate.domain.article.data.Article
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.network.ChatGptService
 import kotlinx.serialization.Serializable

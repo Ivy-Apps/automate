@@ -1,11 +1,11 @@
-package automate.demo.article
+package automate.domain.article
 
 import arrow.core.Either
 import arrow.core.raise.either
 import automate.data.ModelFeedback.Error
 import automate.data.ModelFeedback.Suggestion
-import automate.demo.article.data.Article
-import automate.demo.article.data.BodyItem
+import automate.domain.article.data.Article
+import automate.domain.article.data.BodyItem
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.statemachine.InputMap
 import automate.statemachine.Transition

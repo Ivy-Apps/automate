@@ -1,9 +1,9 @@
 package automate
 
-import automate.demo.article.ArticleProducer
-import automate.demo.article.ArticleStateMachine
-import automate.demo.article.data.BodyItem
 import automate.di.DaggerAppComponent
+import automate.domain.article.ArticleProducer
+import automate.domain.article.ArticleStateMachine
+import automate.domain.article.data.BodyItem
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*

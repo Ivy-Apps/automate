@@ -1,4 +1,4 @@
-package automate.demo.article.data
+package automate.domain.article.data
 
 import kotlinx.serialization.Serializable
 

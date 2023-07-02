@@ -1,7 +1,7 @@
-package automate.demo.article
+package automate.domain.article
 
-import automate.demo.article.data.Article
-import automate.demo.article.data.BodyItem
+import automate.domain.article.data.Article
+import automate.domain.article.data.BodyItem
 import java.io.File
 import java.time.LocalDateTime
 import javax.inject.Inject

@@ -13,6 +13,7 @@ import javax.inject.Inject
 class ChatGptService @Inject constructor(
     private val openAiSecrets: OpenAiSecrets,
     private val ktorClient: KtorClient,
+    private val chatGptConversionLogger: ChatGptConversionLogger,
 ) {
     companion object {
         const val API_URL = "https://api.openai.com/v1/chat/completions"
@@ -39,6 +40,11 @@ class ChatGptService @Inject constructor(
             "Response unsuccessful! $response"
         }
 
-        return response.body<ChatGptResponse>().choices.first().message.content
+        val replyContent = response.body<ChatGptResponse>().choices.first().message.content
+        chatGptConversionLogger.log(
+            conversation = conversation,
+            response = replyContent,
+        )
+        return replyContent
     }
 }

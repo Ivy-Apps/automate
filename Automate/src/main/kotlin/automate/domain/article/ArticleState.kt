@@ -1,7 +1,7 @@
-package automate.demo.article
+package automate.domain.article
 
 import automate.Constants
-import automate.demo.article.data.Article
+import automate.domain.article.data.Article
 import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
