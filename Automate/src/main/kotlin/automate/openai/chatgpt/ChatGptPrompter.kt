@@ -107,7 +107,7 @@ Continue by selecting appropriate options until the task is completed.
         )
         val response = parseChatGptResponse(responseJson)
 
-        val choiceIndex = choiceIndexWithFallback(response, availableTransitions)
+        val choiceIndex = response.choiceId
         Either.Right(
             availableTransitions[choiceIndex] to (response.input ?: emptyMap())
         )
@@ -134,21 +134,10 @@ Continue by selecting appropriate options until the task is completed.
         }
     }
 
-    private fun choiceIndexWithFallback(
-        response: ChatGptReply,
-        availableTransition: List<Trans>
-    ): Int {
-        return try {
-            response.choice.first().code - 'A'.code
-        } catch (e: Exception) {
-            0
-        }
-    }
-
     protected fun List<Trans>.toOptions(): List<Choice> {
         return mapIndexed { index, transition ->
             Choice(
-                choice = ('A' + index).toString(),
+                choiceId = index,
                 title = transition.name,
                 description = transition.description,
                 input = transition.input.map { param ->
@@ -163,13 +152,13 @@ Continue by selecting appropriate options until the task is completed.
 
     @Serializable
     data class ChatGptReply(
-        val choice: String,
+        val choiceId: Int,
         val input: Map<String, String>? = null
     )
 
     @Serializable
     data class Choice(
-        val choice: String,
+        val choiceId: Int,
         val title: String,
         val description: String?,
         val input: List<InputParameter>? = null
