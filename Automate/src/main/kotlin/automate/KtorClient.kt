@@ -3,6 +3,7 @@ package automate
 import automate.di.AppScope
 import automate.di.SingleIn
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.statement.*
 import io.ktor.serialization.kotlinx.json.*
@@ -21,6 +22,11 @@ class KtorClient @Inject constructor() {
                     isLenient = true
                     ignoreUnknownKeys = true
                 })
+            }
+
+            install(HttpTimeout) {
+                requestTimeoutMillis = 60_000 // 60s
+                connectTimeoutMillis = 60_000 // 60s
             }
 
 //            install(Logging) {
