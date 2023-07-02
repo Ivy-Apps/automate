@@ -4,6 +4,7 @@ import automate.di.DaggerAppComponent
 import automate.domain.article.ArticleProducer
 import automate.domain.article.ArticleStateMachine
 import automate.domain.article.data.BodyItem
+import automate.domain.article.sectionsTitles
 import automate.domain.article.wordsCount
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -46,6 +47,8 @@ class AutomateApp @Inject constructor(
 Iteration #${iteration++}: 
 Title: "${article.title}"
 Introduction: ${article.introduction.wordsCount()} words.
+Sections:
+${article.sectionsTitles().joinToString(separator = "\n")}
 $sections sections | ${stateMachine.activeErrors()} active errors | ${stateMachine.errorsOccurred} total errors
 Article length: $articleWords words.
 """.trimIndent()
