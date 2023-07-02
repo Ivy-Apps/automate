@@ -9,9 +9,9 @@ class ArticleProducer @Inject constructor() {
         article.body.forEach { item ->
             when (item) {
                 is BodyItem.Image -> {
-                    append("\n\nIMAGE[")
+                    append("\n\n**IMAGE[")
                     append(item.prompt)
-                    append("]\n\n")
+                    append("]**\n\n")
                 }
 
                 is BodyItem.Section -> {

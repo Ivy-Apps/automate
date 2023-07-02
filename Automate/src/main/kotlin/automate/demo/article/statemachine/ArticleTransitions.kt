@@ -62,7 +62,9 @@ object AddImageTransition : ArticleTransition() {
     private val PARAM_IMAGE_PROMPT = TransitionParam(
         name = "dallEPrompt",
         type = String::class,
-        description = "A prompt that Dall-E will use to generate an image"
+        description = """
+            A prompt that Dall-E will use to generate an image. The image must be fun!
+        """.trimIndent()
     )
 
     override val input = listOf(PARAM_IMAGE_PROMPT)

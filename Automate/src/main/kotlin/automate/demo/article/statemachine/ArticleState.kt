@@ -6,7 +6,7 @@ import automate.statemachine.State
 sealed interface ArticleState : State<Article> {
     object Initial : ArticleState {
         override val data = Article(
-            topic = "State Machines using Kotlin and functional programming",
+            topic = "Using the ChatGPT API with Kotlin and Ktor",
             title = "",
             body = emptyList()
         )
