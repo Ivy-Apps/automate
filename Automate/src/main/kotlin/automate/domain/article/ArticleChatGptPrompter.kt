@@ -90,7 +90,7 @@ class ArticleChatGptPrompter @Inject constructor(
 data class ArticleGptOptimized(
     val title: String,
     val sections: List<String>,
-    val imagePrompts: List<String>,
+    val images: List<String>,
     val lastSection: BodyItem.Section?,
 )
 
@@ -104,7 +104,7 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
             }
         },
         lastSection = body.findLast { it is BodyItem.Section } as? BodyItem.Section,
-        imagePrompts = body.mapNotNull {
+        images = body.mapNotNull {
             when (it) {
                 is BodyItem.Image -> it.prompt
                 is BodyItem.Section -> null

@@ -36,10 +36,41 @@ object SetTitleTransition : ArticleTransition() {
         input: InputMap
     ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
-        ArticleState.Writing(
+        ArticleState.WriteIntroduction(
             data = state.data.copy(title = title)
         ) to emptyList()
     }
+}
+
+object WriteIntroduction : ArticleTransition() {
+    override val name: String = "Write the introduction"
+    override val description: String = "Hook. Grab readers attention with a few short sentences."
+
+    private val PARAM_INTRODUCTION = TransitionParam(
+        name = "introduction",
+        type = String::class,
+        description = """
+            Start the article with a short engaging paragraph about the topic.
+        """.trimIndent(),
+        tips = listOf(
+            "Keep it very short."
+        ),
+    )
+
+    override val input: List<TransitionParam<*>> = listOf(PARAM_INTRODUCTION)
+
+    override fun transition(
+        state: ArticleState,
+        input: InputMap
+    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
+        val introduction = requiredParam(input, PARAM_INTRODUCTION)
+        ArticleState.WriteBody(
+            data = state.data.copy(
+                introduction = introduction,
+            )
+        ) to emptyList()
+    }
+
 }
 
 object AddSectionTransition : ArticleTransition() {
@@ -87,7 +118,7 @@ object AddSectionTransition : ArticleTransition() {
         }
 
         val section = BodyItem.Section(title = title, text = text)
-        ArticleState.Writing(
+        ArticleState.WriteBody(
             data = article.copy(
                 body = article.body + section
             )
@@ -97,17 +128,18 @@ object AddSectionTransition : ArticleTransition() {
 
 object AddImageTransition : ArticleTransition() {
     override val name: String = "Add an image"
-    override val description = "An image"
+    override val description = "Image prompt for an AI model so the reader isn't bored of just text."
 
     private val PARAM_IMAGE_PROMPT = TransitionParam(
         name = "prompt",
         type = String::class,
         description = """
-            A prompt that Dall-E will use to generate an image. The image must be fun!
+            A prompt that Dall-E will use to generate an image.
         """.trimIndent(),
         tips = listOf(
             "Be creative, make it unique.",
-            "Use more bold prompts",
+            "Use bold or abstract prompts",
+            "The image must be fun!",
         )
     )
 
@@ -127,15 +159,31 @@ object AddImageTransition : ArticleTransition() {
     }
 }
 
-object FinalizeTransition : ArticleTransition() {
-    override val name: String = "${ChatGptPrompter.FINALIZE_TAG} Finish the article"
+object WriteConclusionTransition : ArticleTransition() {
+    override val name: String = "${ChatGptPrompter.FINALIZE_TAG} Write a conclusion"
+    override val description = "Conclude the article with a few final sentences."
 
-    override val input: List<TransitionParam<*>> = emptyList()
+    private val PARAM_CONCLUSION = TransitionParam(
+        name = "conclusion",
+        type = String::class,
+        description = """
+            Conclusion to summarize and finish the article.
+        """.trimIndent(),
+        tips = null,
+    )
+
+    override val input: List<TransitionParam<*>> = listOf(PARAM_CONCLUSION)
+
 
     override fun transition(
         state: ArticleState,
         input: InputMap
     ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
-        ArticleState.Finished(state.data) to emptyList()
+        val conclusion = requiredParam(input, PARAM_CONCLUSION)
+        ArticleState.Conclusion(
+            state.data.copy(
+                conclusion = conclusion,
+            )
+        ) to emptyList()
     }
 }

@@ -9,7 +9,7 @@ import javax.inject.Inject
 class ArticleStateMachine @Inject constructor(
     articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
-    initialState = ArticleState.Initial,
+    initialState = ArticleState.SetTitle,
     maxErrors = Constants.MAX_ERRORS,
     maxSteps = Constants.MAX_STEPS,
 ) {
@@ -18,27 +18,33 @@ class ArticleStateMachine @Inject constructor(
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
         val body = state.data.body
         return when (state) {
-            ArticleState.Initial -> {
+            ArticleState.SetTitle -> {
                 listOf(SetTitleTransition)
+            }
+
+            is ArticleState.WriteIntroduction -> {
+                listOf(WriteIntroduction)
             }
 
             is ArticleState.AddedImage -> {
                 listOf(AddSectionTransition)
             }
 
-            is ArticleState.Writing -> {
+            is ArticleState.WriteBody -> {
                 buildList {
                     add(AddImageTransition)
                     if (!body.lastNAreParagraphs(4)) {
                         add(AddSectionTransition)
                     }
-                    if (body.size > 3) {
-                        add(FinalizeTransition)
+                    if (body.size > 5) {
+                        add(WriteConclusionTransition)
                     }
                 }
             }
 
-            is ArticleState.Finished -> listOf()
+            is ArticleState.Conclusion -> {
+                emptyList()
+            }
         }
     }
 

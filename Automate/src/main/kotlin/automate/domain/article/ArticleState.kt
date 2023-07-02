@@ -5,7 +5,7 @@ import automate.domain.article.data.Article
 import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
-    object Initial : ArticleState {
+    object SetTitle : ArticleState {
         override val data = Article(
             topic = Constants.ARTICLE_TOPIC,
             title = "",
@@ -13,19 +13,31 @@ sealed interface ArticleState : State<Article> {
             body = emptyList(),
             conclusion = "",
         )
+        override val expectedOutcome = "setTitle"
     }
 
-    data class Writing(
+    data class WriteIntroduction(
+        override val data: Article,
+    ) : ArticleState {
+        override val expectedOutcome = "writeSection"
+    }
+
+    data class WriteBody(
         override val data: Article
-    ) : ArticleState
+    ) : ArticleState {
+        override val expectedOutcome = "writeBody"
+    }
 
     data class AddedImage(
         override val data: Article
-    ) : ArticleState
+    ) : ArticleState {
+        override val expectedOutcome = "writeSection"
+    }
 
-    data class Finished(
+    data class Conclusion(
         override val data: Article
     ) : ArticleState {
         override val isFinal = true
+        override val expectedOutcome = "writeConclusion"
     }
 }
