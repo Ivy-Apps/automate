@@ -55,7 +55,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
                 
                 You must respond with:
                 - valid a JSON following the pattern
-                - You must choose a choice from the "choices" list providing all "input" for the given choice.
+                - You must choose a choice from the "choices" list providing the "input" for the given choice.
                 """.normalizePrompt()
             )
         )

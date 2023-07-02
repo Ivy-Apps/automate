@@ -41,7 +41,7 @@ object SetTitleTransition : ArticleTransition() {
     }
 }
 
-object AddSectionTransition : ArticleTransition() {
+object AddParagraphTransition : ArticleTransition() {
     override val name: String = "Add a paragraph"
 
     val PARAM_TITLE = TransitionParam(
@@ -72,21 +72,19 @@ object AddSectionTransition : ArticleTransition() {
         val article = state.data
 
         val duplicatedSection = article.body.any {
-            (it as? BodyItem.Section)?.title?.equals(title, ignoreCase = true) == true
+            (it as? BodyItem.Paragraph)?.title?.equals(title, ignoreCase = true) == true
         }
         if (duplicatedSection) {
             raise(
                 Error(
                     """
-                    Duplicated Article section.
-                    Section with title '$title' already exists.
-                    Write only unique sections.
+                    Error: Duplicated paragraph '$title'. Don't try to add it again!
                 """.trimIndent()
                 )
             )
         }
 
-        val section = BodyItem.Section(title = title, text = text)
+        val section = BodyItem.Paragraph(title = title, text = text)
         ArticleState.Writing(
             data = article.copy(
                 body = article.body + section

@@ -23,7 +23,7 @@ sealed interface ModelFeedback {
     ) : ModelFeedback {
         override val feedbackType = "ERROR"
         override val description = """
-            Errors are of highest importance that must be fixed immediately!
+            Errors are of highest importance that must not be repeated!
             The "resolved" boolean will indicate whether they are fixed.
         """.trimIndent()
     }

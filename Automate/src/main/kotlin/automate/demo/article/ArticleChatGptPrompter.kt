@@ -36,7 +36,7 @@ class ArticleChatGptPrompter @Inject constructor(
             ),
             options = listOf(
                 AddImageTransition,
-                AddSectionTransition,
+                AddParagraphTransition,
             ).toOptions(),
             feedback = listOf(),
             choicesLeft = 13,
@@ -44,8 +44,8 @@ class ArticleChatGptPrompter @Inject constructor(
         val response = ChatGptReply(
             option = "B",
             input = mapOf(
-                AddSectionTransition.PARAM_TITLE.name to "Introduction",
-                AddSectionTransition.PARAM_TEXT.name to """
+                AddParagraphTransition.PARAM_TITLE.name to "Introduction",
+                AddParagraphTransition.PARAM_TEXT.name to """
                     Let’s face it! The majority of our work is making requests to an [API]() (usually an [HTTP]() or a [GraphQL]() one) and providing a UI for all possible states — like Loading, Success, Error, and Empty.
                     
                     This should be **simple!** But… Have we set the time to think more deeply about it? From my 8+ years as an Android Developer, more often than not, we tend to complicate things that shouldn’t be complicated at all.

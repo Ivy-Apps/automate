@@ -31,12 +31,12 @@ class AutomateApp @Inject constructor(
             withContext(Dispatchers.IO) {
                 articleStateMachine.state.collectLatest { state ->
                     val body = state.data.body
-                    val sections = body.count { it is BodyItem.Section }
+                    val sections = body.count { it is BodyItem.Paragraph }
                     val images = body.count { it is BodyItem.Image }
                     val articleWords = body.sumOf {
                         when (it) {
                             is BodyItem.Image -> 0
-                            is BodyItem.Section -> it.text.split(" ").size
+                            is BodyItem.Paragraph -> it.text.split(" ").size
                         }
                     }
                     logger.debug(
