@@ -1,7 +1,7 @@
 package automate
 
 import automate.demo.article.ArticleProducer
-import automate.demo.article.statemachine.ArticleStateMachine
+import automate.demo.article.ArticleStateMachine
 import automate.di.DaggerAppComponent
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging

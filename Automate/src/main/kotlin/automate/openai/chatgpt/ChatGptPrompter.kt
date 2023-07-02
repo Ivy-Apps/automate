@@ -1,125 +1,170 @@
 package automate.openai.chatgpt
 
+import arrow.core.Either
+import arrow.core.raise.catch
+import automate.data.ModelFeedback
 import automate.openai.chatgpt.network.ChatGptMessage
+import automate.openai.chatgpt.network.ChatGptResponse
 import automate.openai.chatgpt.network.ChatGptRole
 import automate.openai.chatgpt.network.ChatGptService
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     private val chatGptService: ChatGptService,
 ) {
-    protected abstract fun goal(data: A): String
+    companion object {
+        const val FINALIZE_TAG = "[FINALIZE]"
+    }
 
-    protected abstract fun currentStateJson(state: S, error: String?): String
+    /**
+     * a writer, an Android Developer
+     */
+    protected abstract fun aLabel(data: A): String
+
+    protected abstract fun taskPrompt(data: A): String
+
+    protected abstract fun example(): Pair<State<A>, ChatGptResponse>
+
+
+    private fun modelContext(
+        data: A,
+    ): List<ChatGptMessage> = buildList {
+        add(
+            ChatGptMessage(
+                role = ChatGptRole.System,
+                content = """
+                You're ${aLabel(data)} and a pattern-following assistant that communicates using JSON.
+                You receive:
+                - "currentState": the state of the task that you're completing.
+                - "choices": list of available choices with their input.
+                - "feedback": feedback to guide your next choice.
+                - "choicesLeft": the # of choices that you can make before finalizing the task.
+                
+                You must respond with:
+                - valid a JSON following the pattern
+                - You must choose a choice from the "choices" list providing all "input" for the given choice.
+                """.normalizePrompt()
+            )
+        )
+        add(
+            ChatGptMessage(
+                role = ChatGptRole.System,
+                content = """
+                Your task is to:
+                '''
+                ${taskPrompt(data)}
+                '''
+                by making the optimum number of choices until the task is achieved.
+                When ready you must finalize the goal with the "$FINALIZE_TAG" choices before
+                going out of choices, tracked by "choicesLeft".
+                """.normalizePrompt()
+            )
+        )
+
+        val (exampleState, exampleResponse) = example()
+
+        add(
+            ChatGptMessage(
+                role = ChatGptRole.System,
+                name = "example_user",
+                content = Json.encodeToString(exampleState)
+            )
+        )
+        add(
+            ChatGptMessage(
+                role = ChatGptRole.System,
+                name = "example_assistant",
+                content = Json.encodeToString(exampleResponse)
+            )
+        )
+    }
 
     suspend fun prompt(
         state: S,
-        error: String?,
+        feedback: List<ModelFeedback>,
+        availableTransition: List<Trans>,
+        steps: Int,
         maxSteps: Int,
-        availableTransition: List<Trans>
-    ): Pair<Trans, InputMap> {
-
-        val prompt = buildString {
-            val currentStateJson = currentStateJson(state, error)
-            append(
-                """
-                Current state:
-                $currentStateJson
-                
-                Choose an option:
-                ${availableTransition.toOptionsMenu()}
-            """.trimIndent()
-            )
-        }
+    ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> = catch({
+        val currentState = CurrentState(
+            currentState = state,
+            options = availableTransition.toOptions(),
+            feedback = feedback,
+            choicesLeft = maxSteps - steps,
+        )
+        val prompt = Json.encodeToString(currentState)
 
         val responseJson = chatGptService.prompt(
-            conversation = listOf(
-                ChatGptMessage(
-                    role = ChatGptRole.System,
-                    content = prePrompt(state.data, maxSteps)
-                ),
-                ChatGptMessage(
-                    role = ChatGptRole.User,
-                    content = prompt,
-                )
+            conversation = modelContext(
+                state.data,
+            ) + ChatGptMessage(
+                role = ChatGptRole.User,
+                content = prompt,
             )
         )
 
         val response = Json.decodeFromString<ChatGTPResponse>(responseJson)
         val optionIndex = response.option.first().code - 'A'.code
-        return availableTransition[optionIndex] to (response.input ?: emptyMap())
+        Either.Right(
+            availableTransition[optionIndex] to (response.input ?: emptyMap())
+        )
+    }) {
+        Either.Left(
+            ModelFeedback.Error(
+                feedback = "Exception: ${it.message}"
+            )
+        )
     }
 
-    private fun List<Trans>.toOptionsMenu(): String {
-        var letter = 'A'
-
-        return buildString {
-            this@toOptionsMenu.forEach { transition ->
-                append("${letter++}. ")
-                append(transition.name)
-                transition.input.forEach { param ->
-                    append("<")
-                    append("${param.name}: ${param.type.simpleName}")
-                    if (param.description != null) {
-                        append("; ${param.description}")
-                    }
-                    append("> ")
+    private fun List<Trans>.toOptions(): List<Option> {
+        return mapIndexed { index, transition ->
+            Option(
+                key = ('A' + index).toString(),
+                title = transition.name,
+                description = transition.description,
+                input = transition.input.map { param ->
+                    InputParameter(
+                        name = param.name,
+                        description = param.description,
+                    )
                 }
-                append('\n')
-            }
+            )
         }
     }
-
-    private fun prePrompt(data: A, maxSteps: Int): String = """
-            I'll give you a goal that you must accomplish in maximum $maxSteps steps.
-            You must respond only with valid JSON.
-            On each step I'll give you the available choice you can make.
-            
-            For example:
-            A. Set article title <title: String>
-            B. Add section <sectionTitle: String> <sectionText: String; supports Markdown>
-            C. Finalize article
-            
-            An example of a valid response if you choose Option B would be:
-            {
-                "option": "B",
-                "input" : {
-                    "sectionTitle": "Some section",
-                    "sectionText": "Some **text**\n- point 1\n- point 2\nThis is random."
-                }
-            }
-            
-            Then:
-            I'll respond to you with:
-            - A JSON representing the current state of your work.
-            - A new list of available options and their input parameters.
-            
-            You must again respond only with a JSON of the option that you think
-            will move the state closer to achieving the goal.
-            Your response must be in this JSON format:
-            {
-                "option": "C" // the letter of the option
-                "input" : {
-                    // zero or many input parameters
-                }
-            }
-            
-            ---
-            
-            Here is your goal.
-            GOAL: "${goal(data)}".
-            You must complete the goal defined above by only responding with a JSON
-            with one of the options that I provide you.            
-        """.trimIndent()
 
     @Serializable
     data class ChatGTPResponse(
         val option: String,
         val input: Map<String, String>? = null
     )
+
+    @Serializable
+    data class CurrentState<A>(
+        val currentState: A,
+        val options: List<Option>,
+        val feedback: List<ModelFeedback>,
+        val choicesLeft: Int,
+    )
+
+    @Serializable
+    data class Option(
+        val key: String,
+        val title: String,
+        val description: String?,
+        val input: List<InputParameter>? = null
+    )
+
+    @Serializable
+    data class InputParameter(
+        val name: String,
+        val description: String? = null,
+    )
+
+    private fun String.normalizePrompt(): String = trimIndent().trim()
 }
 

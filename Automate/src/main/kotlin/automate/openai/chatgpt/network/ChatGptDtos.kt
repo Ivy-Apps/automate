@@ -38,4 +38,5 @@ data class ChatGptChoice(
 data class ChatGptMessage(
     val role: ChatGptRole,
     val content: String,
+    val name: String? = null,
 )

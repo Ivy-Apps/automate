@@ -2,10 +2,11 @@ package automate.statemachine
 
 import arrow.core.Either
 import automate.data.ModelFeedback
+import automate.openai.chatgpt.ChatGptPrompter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
+abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
     initialState: S,
     val maxErrors: Int = 2,
     val maxSteps: Int = 100
@@ -13,17 +14,29 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
     private val internalState = MutableStateFlow(initialState)
     val state: StateFlow<S> = internalState
 
-    private var steps = 0
-    private var errors = 0
+    var steps = 0
+        private set
+    var errors = 0
+        private set
     private var feedback: List<ModelFeedback> = listOf()
 
     abstract fun availableTransitions(state: S): List<Trans>
 
-    abstract suspend fun nextTransition(
+    abstract val prompter: ChatGptPrompter<A, S, Trans>
+
+    private suspend fun nextTransition(
         state: S,
         availableTransitions: List<Trans>,
         feedback: List<ModelFeedback>,
-    ): Pair<Trans, InputMap>
+    ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> {
+        return prompter.prompt(
+            state = state,
+            feedback = feedback,
+            availableTransition = availableTransitions,
+            steps = steps,
+            maxSteps = maxSteps,
+        )
+    }
 
     open suspend fun onFinished(state: S, feedback: List<ModelFeedback>) {}
 
@@ -38,11 +51,18 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
             return
         }
 
-        val (transition, input) = nextTransition(
+        val next = nextTransition(
             state = state.value,
             availableTransitions = availableTransitions(state.value),
             feedback = feedback,
         )
+        if (next is Either.Left) {
+            feedback += next.value
+            run()
+            return
+        }
+        val (transition, input) = (next as Either.Right).value
+
         when (
             val res = transition.transition(
                 state = state.value,
@@ -53,6 +73,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A>(
                 feedback += res.value
                 if (++errors < maxErrors) {
                     run()
+                    return
                 } else {
                     feedback += ModelFeedback.FatalError("Max errors reached! Reached $errors errors.")
                     onFinished(state.value, feedback)

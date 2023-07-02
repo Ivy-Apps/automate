@@ -1,9 +1,12 @@
-package automate.demo.article.statemachine
+package automate.demo.article
 
 import arrow.core.Either
 import arrow.core.raise.either
-import automate.demo.article.Article
-import automate.demo.article.BodyItem
+import automate.data.ModelFeedback
+import automate.data.ModelFeedback.Error
+import automate.demo.article.data.Article
+import automate.demo.article.data.BodyItem
+import automate.openai.chatgpt.ChatGptPrompter
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
@@ -20,11 +23,11 @@ object SetTitleTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<String, ArticleState> = either {
+    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         ArticleState.Writing(
             data = state.data.copy(title = title)
-        )
+        ) to emptyList()
     }
 }
 
@@ -43,7 +46,7 @@ object AddSectionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<String, ArticleState> = either {
+    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
         val article = state.data
@@ -52,7 +55,7 @@ object AddSectionTransition : ArticleTransition() {
             data = article.copy(
                 body = article.body + section
             )
-        )
+        ) to emptyList()
     }
 }
 
@@ -72,25 +75,26 @@ object AddImageTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<String, ArticleState> = either {
+    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
         val imagePrompt = requiredParam(input, PARAM_IMAGE_PROMPT)
         val article = state.data
         ArticleState.AddedImage(
             data = article.copy(
                 body = article.body + BodyItem.Image(prompt = imagePrompt)
             )
-        )
+        ) to emptyList()
     }
 }
 
 object FinalizeTransition : ArticleTransition() {
-    override val name: String = "Finalize the article"
+    override val name: String = "${ChatGptPrompter.FINALIZE_TAG} Finish the article"
 
     override val input: List<TransitionParam<*>> = emptyList()
 
-    override fun transition(state: ArticleState, input: InputMap): Either<String, ArticleState> {
-        return Either.Right(
-            ArticleState.Finished(state.data)
-        )
+    override fun transition(
+        state: ArticleState,
+        input: InputMap
+    ): Either<Error, Pair<ArticleState, List<ModelFeedback.Suggestion>>> = either {
+        ArticleState.Finished(state.data) to emptyList()
     }
 }

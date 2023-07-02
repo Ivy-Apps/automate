@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
 import automate.data.ModelFeedback
+import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
 typealias InputMap = Map<String, Any>
@@ -36,6 +37,7 @@ abstract class Transition<S : State<A>, A> {
     }
 }
 
+@Serializable
 data class TransitionParam<T : Any>(
     val name: String,
     val type: KClass<T>,

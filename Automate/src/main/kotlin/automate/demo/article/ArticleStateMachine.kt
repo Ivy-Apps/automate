@@ -1,19 +1,19 @@
-package automate.demo.article.statemachine
+package automate.demo.article
 
 import automate.Constants
-import automate.demo.article.Article
-import automate.demo.article.ai.ArticleChatGptPrompter
-import automate.statemachine.InputMap
+import automate.demo.article.data.Article
 import automate.statemachine.StateMachine
 import javax.inject.Inject
 
 class ArticleStateMachine @Inject constructor(
-    private val articleChatGptPrompter: ArticleChatGptPrompter,
+    articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.Initial,
     maxErrors = Constants.MAX_ERRORS,
     maxSteps = Constants.MAX_STEPS,
 ) {
+    override val prompter = articleChatGptPrompter
+
     override fun availableTransitions(state: ArticleState): List<ArticleTransition> {
         return when (state) {
             ArticleState.Initial -> listOf(
@@ -29,19 +29,6 @@ class ArticleStateMachine @Inject constructor(
 
             is ArticleState.Finished -> listOf()
         }
-    }
-
-    override suspend fun nextTransition(
-        state: ArticleState,
-        availableTransitions: List<ArticleTransition>,
-        error: String?
-    ): Pair<ArticleTransition, InputMap> {
-        return articleChatGptPrompter.prompt(
-            state = state,
-            error = error,
-            maxSteps = maxSteps,
-            availableTransition = availableTransitions,
-        )
     }
 
 }
