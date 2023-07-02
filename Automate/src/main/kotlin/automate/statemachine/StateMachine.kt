@@ -50,6 +50,13 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             onFinished(state.value, feedback)
             return
         }
+        if (errors >= maxErrors) {
+            val msg = "Max errors reached! Reached $errors errors."
+            logger.error(msg)
+            feedback += ModelFeedback.FatalError(msg)
+            onFinished(state.value, feedback)
+            return
+        }
         if (state.value.isFinal) {
             onFinished(state.value, feedback)
             return
@@ -76,16 +83,9 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
         ) {
             is Either.Left -> {
                 feedback += res.value
-                if (++errors < maxErrors) {
-                    run()
-                    return
-                } else {
-                    val msg = "Max errors reached! Reached ${++errors} errors."
-                    logger.error(msg)
-                    feedback += ModelFeedback.FatalError(msg)
-                    onFinished(state.value, feedback)
-                    return
-                }
+                ++errors
+                run()
+                return
             }
 
             is Either.Right -> {
@@ -98,6 +98,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
                 } + suggestions
                 internalState.value = state
                 run()
+                return
             }
         }
     }
