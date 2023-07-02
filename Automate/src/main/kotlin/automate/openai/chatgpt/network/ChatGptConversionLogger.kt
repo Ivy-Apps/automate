@@ -31,7 +31,7 @@ class ChatGptConversionLogger @Inject constructor(
         prePromptLogged = true
 
         logMessage(
-            author = "(example) Chat GPT",
+            author = "Chat GPT",
             content = response,
         )
     }
