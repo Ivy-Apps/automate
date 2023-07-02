@@ -101,13 +101,8 @@ private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
     return ArticleGptOptimized(
         title = title,
         topic = topic,
-        sections = body.mapNotNull {
-            when (it) {
-                is BodyItem.Image -> null
-                is BodyItem.Section -> it.title
-            }
-        },
-        lastSection = body.findLast { it is BodyItem.Section } as? BodyItem.Section,
+        sections = sections(),
+        lastSection = null, //body.findLast { it is BodyItem.Section } as? BodyItem.Section,
         images = body.mapNotNull {
             when (it) {
                 is BodyItem.Image -> it.prompt

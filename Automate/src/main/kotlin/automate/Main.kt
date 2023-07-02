@@ -4,6 +4,7 @@ import automate.di.DaggerAppComponent
 import automate.domain.article.ArticleProducer
 import automate.domain.article.ArticleStateMachine
 import automate.domain.article.data.BodyItem
+import automate.domain.article.wordsCount
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.*
@@ -19,7 +20,7 @@ suspend fun main(args: Array<String>) {
 }
 
 class AutomateApp @Inject constructor(
-    private val articleStateMachine: ArticleStateMachine,
+    private val stateMachine: ArticleStateMachine,
     private val articleProducer: ArticleProducer
 ) {
     private val scope = CoroutineScope(CoroutineName("AutomateApp"))
@@ -29,38 +30,39 @@ class AutomateApp @Inject constructor(
     suspend fun run() {
         scope.launch {
             withContext(Dispatchers.IO) {
-                articleStateMachine.state.collectLatest { state ->
+                stateMachine.state.collectLatest { state ->
                     val article = state.data
                     val body = article.body
                     val sections = body.count { it is BodyItem.Section }
                     val images = body.count { it is BodyItem.Image }
-                    val articleWords = body.sumOf {
+                    val articleWords = article.introduction.wordsCount() + body.sumOf {
                         when (it) {
                             is BodyItem.Image -> 0
-                            is BodyItem.Section -> it.text.split(" ").size
+                            is BodyItem.Section -> it.text.wordsCount()
                         }
-                    }
+                    } + article.conclusion.wordsCount()
                     logger.debug(
                         """
-                            
-                        ------------------------------------------------------
-                        Iteration #${iteration++}: 
-                        Title: "${article.title}"
-                        ${articleStateMachine.errorsOccurred} errors | $sections sections | $images images
-                        Article length: $articleWords words.
-                    """.trimIndent()
+    
+------------------------------------------------------
+Iteration #${iteration++}: 
+Title: "${article.title}"
+Introduction: ${article.introduction.wordsCount()} words.
+$sections sections | $images images | ${stateMachine.activeErrors()} errors | ${stateMachine.errorsOccurred} total errors
+Article length: $articleWords words.
+""".trimIndent()
                     )
                 }
             }
         }
-        articleStateMachine.run()
+        stateMachine.run()
         println("Result: ---------------------")
-        val article = articleStateMachine.state.value.data
+        val article = stateMachine.state.value.data
         println(articleProducer.toMarkdown(article))
         println("--------------------------")
 
         articleProducer.saveInFile(article)
         println("Feedback:")
-        println(articleStateMachine.feedback)
+        println(stateMachine.feedback)
     }
 }

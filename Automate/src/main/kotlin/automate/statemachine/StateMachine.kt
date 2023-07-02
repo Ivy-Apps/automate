@@ -58,7 +58,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             onFinished(state.value, feedback)
             return
         }
-        if (feedback.count { it is ModelFeedback.Error } >= maxActiveErrors) {
+        if (activeErrors() >= maxActiveErrors) {
             val msg = "Max active errors reached! Reached $maxActiveErrors not resolved errors."
             logger.error(msg)
             feedback += ModelFeedback.FatalError(msg)
@@ -110,4 +110,6 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
             }
         }
     }
+
+    fun activeErrors(): Int = feedback.count { it is ModelFeedback.Error }
 }

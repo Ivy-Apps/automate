@@ -42,14 +42,14 @@ object SetTitleTransition : ArticleTransition() {
 
 object WriteIntroduction : ArticleTransition() {
     override val name: String = "Compose the introduction"
-    override val description: String = "Hook the readers with concise and intriguing statements."
+    override val description: String = "Explain what the article is about"
 
     private val PARAM_INTRODUCTION = TransitionParam(
         name = "introduction",
         type = String::class,
-        description = "Engage the reader by hinting at what they'll learn.",
+        description = "Up to 30 words",
         tips = listOf(
-            "Keep it very short."
+            "Make it fun and engaging"
         ),
     )
 
@@ -78,7 +78,7 @@ object AddSectionTransition : ArticleTransition() {
         description = "The title of the article section. It must be an unique section.",
         type = String::class,
         tips = listOf(
-            "Do NOT duplicate already existing sections."
+            "Do NOT duplicate already existing section titles!"
         )
     )
     val PARAM_TEXT = TransitionParam(
@@ -87,7 +87,7 @@ object AddSectionTransition : ArticleTransition() {
         type = String::class,
         tips = listOf(
             "Supports Markdown.",
-            "Code examples are recommended!",
+            "Code examples are recommended.",
             "Keep it short, straightforward and fun."
         )
     )
@@ -100,25 +100,26 @@ object AddSectionTransition : ArticleTransition() {
     ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
-        val article = state.data
 
-        val duplicatedSection = article.body.any {
-            (it as? BodyItem.Section)?.title?.equals(title, ignoreCase = true) == true
+        val article = state.data
+        val sections = article.sections()
+        val duplicatedSection = sections.any { sectionTitle ->
+            sectionTitle.equals(title, ignoreCase = true)
         }
         if (duplicatedSection) {
             raise(
                 Error(
                     """
-                    Error: Duplicated paragraph '$title'. Don't try to add it again!
+                    Error: Duplicated paragraph '$title' in $sections.
                 """.trimIndent()
                 )
             )
         }
 
-        val section = BodyItem.Section(title = title, text = text)
+        val newSection = BodyItem.Section(title = title, text = text)
         ArticleState.WriteBody(
             data = article.copy(
-                body = article.body + section
+                body = state.data.body + newSection
             )
         ) to emptyList()
     }
@@ -133,7 +134,6 @@ object AddImageTransition : ArticleTransition() {
         type = String::class,
         description = "A creative prompt for the AI to generate an image.",
         tips = listOf(
-            "Be creative, make it unique.",
             "Use bold or abstract prompts",
             "The image must be fun!",
         )

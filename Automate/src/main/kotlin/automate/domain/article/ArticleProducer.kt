@@ -10,6 +10,7 @@ class ArticleProducer @Inject constructor() {
     fun toMarkdown(article: Article) = buildString {
         append("# ${article.title}\n")
         append("\n${article.introduction}")
+        append("\n\n")
         article.body.forEach { item ->
             when (item) {
                 is BodyItem.Image -> {
@@ -26,7 +27,7 @@ class ArticleProducer @Inject constructor() {
                 }
             }
         }
-        append("\n${article.conclusion}")
+        append("\n\n${article.conclusion}")
     }
 
     fun saveInFile(article: Article) {
