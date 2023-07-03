@@ -1,16 +1,55 @@
 [versions]
 kotlin = "1.8.21"
+kotlinx-serialization = "1.5.1"
 ktor = "2.3.2"
 dagger = "2.46.1"
 anvil = "2.4.6"
 arrow = "1.2.0-RC"
+arrow-exact = "0.1.0"
 kotest = "5.6.2"
 
 [plugins]
-kotlin-gradleplugin = { id = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 anvil = { id = "com.squareup.anvil", version.ref = "anvil" }
 
 [libraries]
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-contentnegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinxjson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-logging-workaround = { module = "ch.qos.logback:logback-classic", version = "1.2.9" }
+
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
+arrow-exact = { module = "io.arrow-kt:arrow-exact-jvm", version.ref = "arrow-exact" }
+
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
+
+logging-logging3rdparty = { module = "io.github.oshai:kotlin-logging-jvm", version = "4.0.1" }
+logging-slf4j-log4j = { module = "org.slf4j:slf4j-log4j12", version = "1.7.27" }
+logging-slf4j-reload4j = { module = "org.slf4j:slf4j-reload4j", version = "2.0.7" }
+
+kotest-runner = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-property = { module = "io.kotest:kotest-property", version.ref = "kotest" }
+kotest-assertions-ktor = { module = "io.kotest.extensions:kotest-assertions-ktor", version = "2.0.0" }
+kotest-assertions-arrow = { module = "io.kotest.extensions:kotest-assertions-arrow", version = "1.3.3" }
 
 [bundles]
+ktor = [
+    "ktor-client-core", "ktor-client-cio",
+    "ktor-client-contentnegotiation",
+    "ktor-serialization-kotlinxjson",
+    "kotlinx-serialization",
+    "ktor-client-logging",
+    "ktor-logging-workaround"
+]
+arrow = ["arrow-core", "arrow-fx-coroutines", "arrow-exact"]
+logging = ["logging-logging3rdparty", "logging-slf4j-log4j", "logging-slf4j-reload4j"]
+kotest = [
+    "kotest-runner", "kotest-assertions", "kotest-property",
+    "kotest-assertions-arrow", "kotest-assertions-ktor"
+]
