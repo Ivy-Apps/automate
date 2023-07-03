@@ -1,10 +1,10 @@
 package automate.statemachine.prompt
 
 import arrow.core.Either
-import automate.data.ModelFeedback
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
+import automate.statemachine.data.ModelFeedback
 
 interface StateMachinePrompter<A : Any, S : State<A>, Trans : Transition<S, A>> {
     suspend fun prompt(

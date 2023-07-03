@@ -5,11 +5,11 @@ import arrow.core.raise.either
 import automate.article.data.Article
 import automate.article.data.BodyItem
 import automate.article.sectionsTitles
-import automate.data.ModelFeedback.Error
-import automate.data.ModelFeedback.Suggestion
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
+import automate.statemachine.data.ModelFeedback.Error
+import automate.statemachine.data.ModelFeedback.Suggestion
 
 sealed class ArticleTransition : Transition<ArticleState, Article>()
 

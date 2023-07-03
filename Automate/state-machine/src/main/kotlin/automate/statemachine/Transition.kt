@@ -3,7 +3,7 @@ package automate.statemachine
 import arrow.core.Either
 import arrow.core.raise.Raise
 import arrow.core.raise.ensureNotNull
-import automate.data.ModelFeedback
+import automate.statemachine.data.ModelFeedback
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 

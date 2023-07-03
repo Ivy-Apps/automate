@@ -1,8 +1,8 @@
 package automate.statemachine
 
 import arrow.core.Either
-import automate.data.ModelFeedback
 import automate.logger
+import automate.statemachine.data.ModelFeedback
 import automate.statemachine.prompt.StateMachinePrompter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

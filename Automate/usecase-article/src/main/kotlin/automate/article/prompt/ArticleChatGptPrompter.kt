@@ -6,7 +6,6 @@ import automate.article.statemachine.AddSectionTransition
 import automate.article.statemachine.ArticleState
 import automate.article.statemachine.ArticleTransition
 import automate.article.statemachine.SetTitleTransition
-import automate.data.ModelFeedback
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.normalizePrompt
@@ -14,6 +13,7 @@ import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.ChatGptService
 import automate.openai.chatgpt.data.ChatGptReply
 import automate.openai.chatgpt.data.Choice
+import automate.statemachine.data.ModelFeedback
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

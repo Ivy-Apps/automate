@@ -1,4 +1,4 @@
-package automate.data
+package automate.statemachine.data
 
 import kotlinx.serialization.Serializable
 
