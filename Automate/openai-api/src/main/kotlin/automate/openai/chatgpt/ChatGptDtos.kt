@@ -1,4 +1,4 @@
-package automate.openai.chatgpt.network
+package automate.openai.chatgpt
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

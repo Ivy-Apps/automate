@@ -3,7 +3,7 @@ package automate.statemachine
 import arrow.core.Either
 import automate.data.ModelFeedback
 import automate.logger
-import automate.openai.chatgpt.ChatGptPrompter
+import automate.statemachine.prompt.StateMachinePrompter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -25,7 +25,7 @@ abstract class StateMachine<S : State<A>, Trans : Transition<S, A>, A : Any>(
 
     abstract fun availableTransitions(state: S): List<Trans>
 
-    abstract val prompter: ChatGptPrompter<A, S, Trans>
+    abstract val prompter: StateMachinePrompter<A, S, Trans>
 
     private suspend fun nextTransition(
         state: S,

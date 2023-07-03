@@ -1,7 +1,5 @@
 package automate
 
-import automate.openai.chatgpt.normalizePrompt
-
 object Constants {
     const val MODEL_LABEL =
         "expert build engineer specializing in Kotlin and Gradle Kotlin DSL"

@@ -1,9 +1,8 @@
-package automate.openai.chatgpt.network
+package automate.openai.chatgpt
 
 import automate.KtorClient
 import automate.di.AppScope
 import automate.di.SingleIn
-import automate.openai.OpenAiSecrets
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*

@@ -3,19 +3,18 @@ package automate.openai.chatgpt
 import arrow.core.Either
 import arrow.core.raise.catch
 import automate.data.ModelFeedback
-import automate.openai.chatgpt.network.ChatGptMessage
-import automate.openai.chatgpt.network.ChatGptRole
-import automate.openai.chatgpt.network.ChatGptService
+import automate.normalizePrompt
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
+import automate.statemachine.prompt.StateMachinePrompter
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     private val chatGptService: ChatGptService,
-) {
+) : StateMachinePrompter<A, S, Trans> {
 
     /**
      * a writer, an Android Developer
@@ -84,7 +83,7 @@ Continue by selecting appropriate options until the task is completed.
         )
     }
 
-    suspend fun prompt(
+    override suspend fun prompt(
         state: S,
         feedback: List<ModelFeedback>,
         availableTransitions: List<Trans>,
@@ -175,7 +174,3 @@ Continue by selecting appropriate options until the task is completed.
         val description: String? = null,
     )
 }
-
-fun String.normalizePrompt(): String = trimIndent()
-    .trim().replace("\t", "")
-

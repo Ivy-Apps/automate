@@ -1,4 +1,4 @@
-package automate.openai.chatgpt.network
+package automate.openai.chatgpt
 
 import automate.di.AppScope
 import automate.di.SingleIn
