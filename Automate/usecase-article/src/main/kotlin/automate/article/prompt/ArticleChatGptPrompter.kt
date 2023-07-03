@@ -8,8 +8,8 @@ import automate.article.statemachine.ArticleTransition
 import automate.article.statemachine.SetTitleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
+import automate.openai.chatgpt.ChatGptApi
 import automate.openai.chatgpt.ChatGptPrompter
-import automate.openai.chatgpt.ChatGptService
 import automate.openai.chatgpt.data.ChatGptReply
 import automate.openai.chatgpt.data.Choice
 import automate.openai.normalizePrompt
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @SingleIn(AppScope::class)
 class ArticleChatGptPrompter @Inject constructor(
-    chatGptService: ChatGptService
+    chatGptService: ChatGptApi
 ) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(chatGptService) {
     override fun aLabel(): String {
         return ArticleConstants.MODEL_LABEL

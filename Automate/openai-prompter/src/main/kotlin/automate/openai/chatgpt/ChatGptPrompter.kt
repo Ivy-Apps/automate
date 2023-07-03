@@ -15,7 +15,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
-    private val chatGptService: ChatGptService,
+    private val chatGptService: ChatGptApi,
 ) : StateMachinePrompter<A, S, Trans> {
 
     /**
