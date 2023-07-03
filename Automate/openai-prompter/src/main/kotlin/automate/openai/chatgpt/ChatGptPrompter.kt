@@ -4,11 +4,13 @@ import arrow.core.Either
 import arrow.core.raise.catch
 import automate.data.ModelFeedback
 import automate.normalizePrompt
+import automate.openai.chatgpt.data.ChatGptReply
+import automate.openai.chatgpt.data.Choice
+import automate.openai.chatgpt.data.InputParameter
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
 import automate.statemachine.prompt.StateMachinePrompter
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -153,24 +155,4 @@ Continue by selecting appropriate options until the task is completed.
             )
         }
     }
-
-    @Serializable
-    data class ChatGptReply(
-        val choiceId: Int,
-        val input: Map<String, String>? = null
-    )
-
-    @Serializable
-    data class Choice(
-        val choiceId: Int,
-        val title: String,
-        val description: String?,
-        val input: List<InputParameter>? = null
-    )
-
-    @Serializable
-    data class InputParameter(
-        val name: String,
-        val description: String? = null,
-    )
 }

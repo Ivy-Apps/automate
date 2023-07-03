@@ -1,10 +1,10 @@
 package automate
 
+import automate.article.data.BodyItem
+import automate.article.sectionsTitles
+import automate.article.statemachine.ArticleStateMachine
+import automate.article.wordsCount
 import automate.domain.article.ArticleProducer
-import automate.domain.article.ArticleStateMachine
-import automate.domain.article.data.BodyItem
-import automate.domain.article.sectionsTitles
-import automate.domain.article.wordsCount
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject

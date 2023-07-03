@@ -1,7 +1,7 @@
-package automate.domain.article
+package automate.article
 
-import automate.domain.article.data.Article
-import automate.domain.article.data.BodyItem
+import automate.article.data.Article
+import automate.article.data.BodyItem
 
 fun String.wordsCount(): Int = if (isNotBlank()) split(" ").size else 0
 

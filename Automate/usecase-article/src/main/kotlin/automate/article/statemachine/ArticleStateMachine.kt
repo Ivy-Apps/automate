@@ -1,7 +1,10 @@
-package automate.domain.article
+package automate.article.statemachine
 
 import automate.Constants
-import automate.domain.article.data.Article
+import automate.article.data.Article
+import automate.article.prompt.ArticleChatGptPrompter
+import automate.article.sectionsTitles
+import automate.article.wordsCount
 import automate.statemachine.StateMachine
 import javax.inject.Inject
 

@@ -1,14 +1,19 @@
-package automate.domain.article
+package automate.article.prompt
 
 import automate.Constants
+import automate.article.data.Article
+import automate.article.statemachine.AddSectionTransition
+import automate.article.statemachine.ArticleState
+import automate.article.statemachine.ArticleTransition
+import automate.article.statemachine.SetTitleTransition
 import automate.data.ModelFeedback
 import automate.di.AppScope
 import automate.di.SingleIn
-import automate.domain.article.data.Article
-import automate.domain.article.data.BodyItem
 import automate.normalizePrompt
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.ChatGptService
+import automate.openai.chatgpt.data.ChatGptReply
+import automate.openai.chatgpt.data.Choice
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -95,28 +100,5 @@ ${Constants.ARTICLE_REQUIREMENTS}
         val expectedOutcome: String,
         val feedback: List<String>,
         val article: ArticleGptOptimized,
-    )
-}
-
-@Serializable
-data class ArticleGptOptimized(
-    val title: String,
-    val topic: String,
-    val currentWords: Int,
-    val targetWords: Int,
-    val introduction: String,
-    val sectionsTitles: List<String>,
-    val body: List<BodyItem>,
-)
-
-private fun Article.optimizeForChatGpt(): ArticleGptOptimized {
-    return ArticleGptOptimized(
-        title = title,
-        topic = topic,
-        currentWords = wordsCount(),
-        targetWords = Constants.ARTICLE_TARGET_WORDS_COUNT,
-        introduction = introduction,
-        sectionsTitles = sectionsTitles(),
-        body = body,
     )
 }
