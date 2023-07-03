@@ -2,20 +2,19 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.raise.catch
-import automate.openai.chatgpt.data.ChatGptReply
+import automate.openai.chatgpt.data.ChatGptResponse
 import automate.openai.chatgpt.data.Choice
 import automate.openai.chatgpt.data.InputParameter
-import automate.openai.normalizePrompt
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
 import automate.statemachine.data.ModelFeedback
 import automate.statemachine.prompt.StateMachinePrompter
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     private val chatGptService: ChatGptApi,
+    private val chatGptPrePrompter: ChatGptPrePrompter,
 ) : StateMachinePrompter<A, S, Trans> {
 
     /**
@@ -25,7 +24,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     protected abstract fun taskPrompt(): String
 
-    protected abstract fun example(): Pair<String, ChatGptReply>
+    protected abstract fun example(): ChatGptPrePrompter.Example
 
     protected abstract fun currentStateAsJson(
         state: S,
@@ -36,54 +35,6 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     ): String
 
     protected abstract fun refineData(state: S): A
-
-    private fun modelContext(): List<ChatGptMessage> = buildList {
-        add(
-            ChatGptMessage(
-                role = ChatGptRole.System,
-                content = """
-You are ${aLabel()}, a pattern-following assistant using JSON for communication. 
-You'll receive:
-- "article": The current state of the article.
-- "choices": A set of options each having its own specific input.
-- "feedback": Instructions to rectify errors and make better future decisions.
-
-Make sure to:
-- Adhere to valid JSON formatting rules and ensure proper escaping.
-- Pick an option from "choices" and provide the necessary "input" for it.
-""".normalizePrompt()
-            )
-        )
-        add(
-            ChatGptMessage(
-                role = ChatGptRole.System,
-                content = """
-Your task is to compile an article:
-'''
-${taskPrompt().normalizePrompt()}
-'''
-Continue by selecting appropriate options until the task is completed.
-""".normalizePrompt()
-            )
-        )
-
-        val (exampleStateJson, exampleResponse) = example()
-
-        add(
-            ChatGptMessage(
-                role = ChatGptRole.System,
-                name = "example_user",
-                content = exampleStateJson,
-            )
-        )
-        add(
-            ChatGptMessage(
-                role = ChatGptRole.System,
-                name = "example_assistant",
-                content = Json.encodeToString(exampleResponse)
-            )
-        )
-    }
 
     override suspend fun prompt(
         state: S,
@@ -100,8 +51,13 @@ Continue by selecting appropriate options until the task is completed.
             choicesLeft = maxSteps - steps,
         )
 
+        val prePrompt = chatGptPrePrompter.prePromptList(
+            modelLabel = aLabel(),
+            taskPrompt = taskPrompt(),
+            example = example()
+        )
         val responseJson = chatGptService.prompt(
-            conversation = modelContext() + ChatGptMessage(
+            conversation = prePrompt + ChatGptMessage(
                 role = ChatGptRole.User,
                 content = prompt,
             )
@@ -126,16 +82,16 @@ Continue by selecting appropriate options until the task is completed.
         )
     }
 
-    private fun parseChatGptResponse(responseJson: String): ChatGptReply {
+    private fun parseChatGptResponse(responseJson: String): ChatGptResponse {
         return try {
-            Json.decodeFromString<ChatGptReply>(responseJson)
+            Json.decodeFromString<ChatGptResponse>(responseJson)
         } catch (e: Exception) {
             try {
                 // Add missing '}'
-                Json.decodeFromString<ChatGptReply>("$responseJson}")
+                Json.decodeFromString<ChatGptResponse>("$responseJson}")
             } catch (e: Exception) {
                 // Remove duplicated '}'
-                Json.decodeFromString<ChatGptReply>(responseJson.dropLast(1))
+                Json.decodeFromString<ChatGptResponse>(responseJson.dropLast(1))
             }
         }
     }

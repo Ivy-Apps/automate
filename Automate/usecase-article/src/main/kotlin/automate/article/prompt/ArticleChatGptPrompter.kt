@@ -9,8 +9,9 @@ import automate.article.statemachine.SetTitleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.openai.chatgpt.ChatGptApi
+import automate.openai.chatgpt.ChatGptPrePrompter
 import automate.openai.chatgpt.ChatGptPrompter
-import automate.openai.chatgpt.data.ChatGptReply
+import automate.openai.chatgpt.data.ChatGptResponse
 import automate.openai.chatgpt.data.Choice
 import automate.openai.normalizePrompt
 import automate.statemachine.data.ModelFeedback
@@ -21,8 +22,12 @@ import javax.inject.Inject
 
 @SingleIn(AppScope::class)
 class ArticleChatGptPrompter @Inject constructor(
-    chatGptService: ChatGptApi
-) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(chatGptService) {
+    chatGptService: ChatGptApi,
+    chatGptPrePrompter: ChatGptPrePrompter,
+) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(
+    chatGptService = chatGptService,
+    chatGptPrePrompter = chatGptPrePrompter,
+) {
     override fun aLabel(): String {
         return ArticleConstants.MODEL_LABEL
     }
@@ -35,7 +40,7 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
 """.normalizePrompt()
     }
 
-    override fun example(): Pair<String, ChatGptReply> {
+    override fun example(): ChatGptPrePrompter.Example {
         val state = StateGptOptimized(
             article = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
@@ -51,14 +56,17 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
             ).toOptions(),
             feedback = listOf(),
         )
-        val response = ChatGptReply(
+        val response = ChatGptResponse(
             choiceId = 1,
             input = mapOf(
                 SetTitleTransition.PARAM_TITLE.name to "[Android] Kotlin Flows + Ktor = Flawless HTTP requests",
             )
         )
 
-        return Json.encodeToString(state) to response
+        return ChatGptPrePrompter.Example(
+            userPrompt = Json.encodeToString(state),
+            chatGptResponse = response,
+        )
     }
 
     override fun currentStateAsJson(

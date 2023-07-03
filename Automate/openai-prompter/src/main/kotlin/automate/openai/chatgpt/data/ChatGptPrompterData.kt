@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class ChatGptReply(
+data class ChatGptResponse(
     val choiceId: Int,
     val input: Map<String, String>? = null
 )

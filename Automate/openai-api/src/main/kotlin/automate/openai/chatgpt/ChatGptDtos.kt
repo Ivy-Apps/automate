@@ -18,13 +18,13 @@ enum class ChatGptRole {
 }
 
 @Serializable
-data class ChatGptRequest(
+data class ChatGptApiRequest(
     val model: String,
     val messages: List<ChatGptMessage>,
 )
 
 @Serializable
-data class ChatGptResponse(
+data class ChatGptApiResponse(
     val choices: List<ChatGptChoice>,
 )
 

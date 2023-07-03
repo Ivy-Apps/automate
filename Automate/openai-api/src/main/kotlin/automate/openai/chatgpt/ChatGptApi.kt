@@ -29,7 +29,7 @@ class ChatGptApi @Inject constructor(
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer ${openAiSecrets.apiKey}")
                 setBody(
-                    ChatGptRequest(
+                    ChatGptApiRequest(
                         model = MODEL_GPT_3_5_TURBO_16k,
                         messages = conversation,
                     )
@@ -40,7 +40,7 @@ class ChatGptApi @Inject constructor(
             "Response unsuccessful! $response"
         }
 
-        val replyContent = response.body<ChatGptResponse>().choices.first().message.content
+        val replyContent = response.body<ChatGptApiResponse>().choices.first().message.content
         chatGptConversionLogger.log(
             conversation = conversation,
             response = replyContent,
