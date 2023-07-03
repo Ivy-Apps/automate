@@ -1,13 +1,13 @@
 package automate.article.statemachine
 
-import automate.Constants
+import automate.article.ArticleConstants
 import automate.article.data.Article
 import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
     object SetTitle : ArticleState {
         override val data = Article(
-            topic = Constants.ARTICLE_TOPIC,
+            topic = ArticleConstants.ARTICLE_TOPIC,
             title = "",
             introduction = "",
             body = emptyList(),

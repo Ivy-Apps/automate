@@ -1,6 +1,6 @@
 package automate.article.statemachine
 
-import automate.Constants
+import automate.article.ArticleConstants
 import automate.article.data.Article
 import automate.article.prompt.ArticleChatGptPrompter
 import automate.article.sectionsTitles
@@ -12,9 +12,9 @@ class ArticleStateMachine @Inject constructor(
     articleChatGptPrompter: ArticleChatGptPrompter,
 ) : StateMachine<ArticleState, ArticleTransition, Article>(
     initialState = ArticleState.SetTitle,
-    maxActiveErrors = Constants.MAX_ACTIVE_ERRORS,
-    maxErrors = Constants.MAX_ERRORS,
-    maxSteps = Constants.MAX_STEPS,
+    maxActiveErrors = ArticleConstants.MAX_ACTIVE_ERRORS,
+    maxErrors = ArticleConstants.MAX_ERRORS,
+    maxSteps = ArticleConstants.MAX_STEPS,
 ) {
     override val prompter = articleChatGptPrompter
 
@@ -31,12 +31,12 @@ class ArticleStateMachine @Inject constructor(
             }
 
             is ArticleState.WriteBody -> {
-                if (article.wordsCount() > Constants.ARTICLE_TARGET_WORDS_COUNT + 200) {
+                if (article.wordsCount() > ArticleConstants.ARTICLE_TARGET_WORDS_COUNT + 200) {
                     listOf(WriteConclusionTransition)
                 } else {
                     buildList {
                         add(AddSectionTransition)
-                        if (article.sectionsTitles().size >= Constants.MIN_SECTIONS_COUNT) {
+                        if (article.sectionsTitles().size >= ArticleConstants.MIN_SECTIONS_COUNT) {
                             add(WriteConclusionTransition)
                         }
                     }

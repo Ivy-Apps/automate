@@ -1,6 +1,8 @@
-package automate
+package automate.article
 
-object Constants {
+import automate.openai.normalizePrompt
+
+object ArticleConstants {
     const val MODEL_LABEL =
         "expert build engineer specializing in Kotlin and Gradle Kotlin DSL"
     val ARTICLE_TOPIC = """
@@ -15,7 +17,6 @@ Gradle Kotlin DSL modularization
 - Make it fun! 
 - Aim for approx $ARTICLE_TARGET_WORDS_COUNT words.
 """.normalizePrompt()
-
 
     const val MAX_ACTIVE_ERRORS = 10
     const val MAX_ERRORS = 25

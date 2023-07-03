@@ -1,6 +1,6 @@
 package automate.article.prompt
 
-import automate.Constants
+import automate.article.ArticleConstants
 import automate.article.data.Article
 import automate.article.data.BodyItem
 import automate.article.sectionsTitles
@@ -23,7 +23,7 @@ internal fun Article.optimizeForChatGpt(): ArticleGptOptimized {
         title = title,
         topic = topic,
         currentWords = wordsCount(),
-        targetWords = Constants.ARTICLE_TARGET_WORDS_COUNT,
+        targetWords = ArticleConstants.ARTICLE_TARGET_WORDS_COUNT,
         introduction = introduction,
         sectionsTitles = sectionsTitles(),
         body = body,

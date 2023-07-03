@@ -1,6 +1,6 @@
 package automate.article.prompt
 
-import automate.Constants
+import automate.article.ArticleConstants
 import automate.article.data.Article
 import automate.article.statemachine.AddSectionTransition
 import automate.article.statemachine.ArticleState
@@ -8,11 +8,11 @@ import automate.article.statemachine.ArticleTransition
 import automate.article.statemachine.SetTitleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
-import automate.normalizePrompt
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.ChatGptService
 import automate.openai.chatgpt.data.ChatGptReply
 import automate.openai.chatgpt.data.Choice
+import automate.openai.normalizePrompt
 import automate.statemachine.data.ModelFeedback
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -24,14 +24,14 @@ class ArticleChatGptPrompter @Inject constructor(
     chatGptService: ChatGptService
 ) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(chatGptService) {
     override fun aLabel(): String {
-        return Constants.MODEL_LABEL
+        return ArticleConstants.MODEL_LABEL
     }
 
     override fun taskPrompt(): String {
         return """
-Your task is to compose an informative and engaging article focusing on the topic: "${Constants.ARTICLE_TOPIC}".
+Your task is to compose an informative and engaging article focusing on the topic: "${ArticleConstants.ARTICLE_TOPIC}".
 Please adhere to the following guidelines for this assignment: 
-${Constants.ARTICLE_REQUIREMENTS}
+${ArticleConstants.ARTICLE_REQUIREMENTS}
 """.normalizePrompt()
     }
 

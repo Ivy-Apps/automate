@@ -2,10 +2,10 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.raise.catch
-import automate.normalizePrompt
 import automate.openai.chatgpt.data.ChatGptReply
 import automate.openai.chatgpt.data.Choice
 import automate.openai.chatgpt.data.InputParameter
+import automate.openai.normalizePrompt
 import automate.statemachine.InputMap
 import automate.statemachine.State
 import automate.statemachine.Transition
