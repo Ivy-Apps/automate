@@ -1,11 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.21"
-    kotlin("plugin.serialization") version "1.8.21"
-    kotlin("kapt") version "1.8.21"
-    //https://github.com/square/anvil
-    id("com.squareup.anvil") version "2.4.6"
+    kotlin("jvm") version libs.versions.kotlin
+    kotlin("plugin.serialization") version libs.versions.kotlin
+    kotlin("kapt") version libs.versions.kotlin
+    alias(libs.plugins.anvil)
 
     application
 }
