@@ -8,7 +8,7 @@ import automate.statemachine.data.Feedback
 data class State(
     val name: String,
     override val data: MutableMap<String, Any>,
-    val special: SpecialState? = null,
+    val isFinal: Boolean = false,
 ) : StateScope {
     private val _transitions = mutableMapOf<String, Transition>()
     val transitions: Map<String, Transition> = _transitions
@@ -28,9 +28,4 @@ data class State(
             }
         )
     }
-}
-
-enum class SpecialState {
-    Initial,
-    Final,
 }

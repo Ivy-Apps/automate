@@ -23,7 +23,7 @@ class StateMachine(
     val data: Map<String, Any> = _data
 
     suspend fun run(
-        nextTransition: suspend StateMachineTransitionScope.(List<Transition>) -> ExecutableTransition
+        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> ExecutableTransition
     ): Completion {
         if (states.size >= maxSteps) {
             return Completion.MaxStepsReached(steps)
@@ -31,15 +31,32 @@ class StateMachine(
         if (errors.size >= maxErrors) {
             return Completion.MaxErrorsReached(errors)
         }
+        if (currentState.isFinal) {
+            return Completion.Success(data, steps)
+        }
 
-        TODO()
+        return executeTransition(nextTransition)
+    }
+
+    private suspend fun executeTransition(
+        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> ExecutableTransition
+    ): Completion {
+        try {
+            val transition = nextTransition(NextTransitionScopeImpl(), currentState.transitions)
+            val (nextState, feedback) = transition.execute()
+            // TODO: Implement state transition and feedback!
+        } catch (e: NextTransitionScopeImpl.Error) {
+            errors.add(Feedback.Error(e.error))
+        } catch (e: TransitionScopeImpl.Error) {
+            errors.add(Feedback.Error(e.error))
+        }
+
+        return run(nextTransition)
     }
 
 
     override fun initialState(name: String, block: StateScope.() -> Unit) {
-        _currentState = createState(name, block).copy(
-            special = SpecialState.Initial
-        ).also {
+        _currentState = createState(name, block).also {
             _states[name] = it
         }
     }
@@ -50,7 +67,7 @@ class StateMachine(
 
     override fun finalState(name: String) {
         _states[name] = createState(name, block = {}).copy(
-            special = SpecialState.Final
+            isFinal = true,
         )
     }
 
@@ -63,17 +80,31 @@ class StateMachine(
 
 
     sealed interface Completion {
-        data class Success(val data: Map<String, Any>) : Completion
+        data class Success(
+            val data: Map<String, Any>,
+            val steps: List<ExecutableTransition>
+        ) : Completion
+
         data class MaxErrorsReached(val errors: List<Feedback.Error>) : Completion
-        data class MaxStepsReached(val transitions: List<ExecutableTransition>) : Completion
+        data class MaxStepsReached(val steps: List<ExecutableTransition>) : Completion
     }
 
+    @Throws(StateMachineError::class)
     private fun error(error: String): Nothing {
         throw StateMachineError(error)
     }
 }
 
-interface StateMachineTransitionScope {
+class NextTransitionScopeImpl : NextTransitionScope {
+    @Throws(Error::class)
+    override fun error(error: String): Nothing {
+        throw Error(error)
+    }
+
+    data class Error(val error: String) : Exception()
+}
+
+interface NextTransitionScope {
     @StateMachineDsl
     fun error(error: String): Nothing
 }

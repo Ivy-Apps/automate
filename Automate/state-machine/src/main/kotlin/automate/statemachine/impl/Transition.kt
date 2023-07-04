@@ -6,7 +6,7 @@ import automate.statemachine.TransitionScope
 import automate.statemachine.data.Feedback
 
 typealias InputsMap = MutableMap<String, String>
-typealias TransitionFun = (InputsMap) -> Pair<String, List<Feedback.Warning>>
+typealias TransitionFun = suspend (InputsMap) -> Pair<String, List<Feedback.Warning>>
 
 data class Transition(
     val name: String,
@@ -23,10 +23,14 @@ data class Transition(
 }
 
 data class ExecutableTransition(
-    val name: String,
-    val inputsMap: InputsMap,
-    val transitionFun: TransitionFun,
-)
+    private val name: String,
+    private val inputsMap: InputsMap,
+    private val transitionFun: TransitionFun,
+) {
+    suspend fun execute(): Pair<String, List<Feedback.Warning>> {
+        return transitionFun(inputsMap)
+    }
+}
 
 data class InputDef(
     val name: String,
@@ -54,9 +58,9 @@ class TransitionScopeImpl(
         return state to nonFatalFeedback
     }
 
-    @Throws(TransitionError::class)
+    @Throws(Error::class)
     override fun error(error: String): Nothing {
-        throw TransitionError(error)
+        throw Error(error)
     }
 
     override fun input(name: String): String {
@@ -66,6 +70,7 @@ class TransitionScopeImpl(
     override fun warning(feedback: String) {
         nonFatalFeedback.add(Feedback.Warning(feedback))
     }
+
+    data class Error(val error: String) : Exception()
 }
 
-data class TransitionError(val error: String) : Exception()
