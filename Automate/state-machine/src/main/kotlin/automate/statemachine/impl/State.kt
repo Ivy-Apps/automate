@@ -7,8 +7,8 @@ import automate.statemachine.data.Feedback
 
 data class State(
     val name: String,
-    val special: SpecialState?,
     override val data: MutableMap<String, Any>,
+    val special: SpecialState? = null,
 ) : StateScope {
     private val _transitions = mutableMapOf<String, Transition>()
     val transitions: Map<String, Transition> = _transitions

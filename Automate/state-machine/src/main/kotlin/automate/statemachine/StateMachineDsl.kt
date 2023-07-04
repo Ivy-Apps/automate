@@ -14,8 +14,6 @@ fun stateMachine(block: StateMachineScope.() -> Unit): StateMachine {
 }
 
 interface StateMachineScope {
-    val data: MutableMap<String, Any>
-
     @StateMachineDsl
     fun initialState(name: String, block: StateScope.() -> Unit)
 
@@ -27,6 +25,7 @@ interface StateMachineScope {
 }
 
 interface StateScope {
+    @StateMachineDsl
     val data: MutableMap<String, Any>
 
     @StateMachineDsl
@@ -77,6 +76,7 @@ suspend fun test() {
             }) {
                 val email = input("email")
                 val password = input("password")
+                data["auth-token"] = "ok"
                 goTo("main") {
                     warning("Use stronger password.")
                 }
