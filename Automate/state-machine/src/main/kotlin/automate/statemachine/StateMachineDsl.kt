@@ -86,7 +86,8 @@ suspend fun test() {
         finalState("main")
     }
 
-    stateMachine.run {
-        it.values.first() to emptyMap()
+    stateMachine.run { transitions ->
+        val transition = transitions.values.first()
+        transition to emptyMap()
     }
 }

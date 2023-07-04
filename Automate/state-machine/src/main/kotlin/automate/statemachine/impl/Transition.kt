@@ -12,7 +12,7 @@ data class Transition(
     val inputs: List<InputDef>,
     private val transitionFun: TransitionFun,
 ) {
-    fun prepare(inputsMap: InputsMap): ExecutableTransition {
+    internal fun prepare(inputsMap: InputsMap): ExecutableTransition {
         return ExecutableTransition(
             name = name,
             inputsMap = inputsMap,

@@ -51,7 +51,9 @@ class StateMachine(
                 feedback = feedback
             )
             val (transition, inputs) = nextTransition(scope, currentState.transitions)
-            val (nextStateName, feedback) = transition.prepare(inputs).execute()
+            val (nextStateName, feedback) = transition.prepare(inputs)
+                .also { steps.add(it) }
+                .execute()
             val nextState = states[nextStateName] ?: error("Invalid next state '$nextStateName'.")
             this.feedback = feedback
             _currentState = nextState
