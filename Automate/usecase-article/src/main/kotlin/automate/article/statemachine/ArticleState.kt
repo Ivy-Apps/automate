@@ -2,7 +2,6 @@ package automate.article.statemachine
 
 import automate.article.ArticleConstants
 import automate.article.data.Article
-import automate.statemachine.State
 
 sealed interface ArticleState : State<Article> {
     object SetTitle : ArticleState {

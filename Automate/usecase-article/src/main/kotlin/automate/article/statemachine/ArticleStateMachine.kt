@@ -5,7 +5,6 @@ import automate.article.data.Article
 import automate.article.prompt.ArticleChatGptPrompter
 import automate.article.sectionsTitles
 import automate.article.wordsCount
-import automate.statemachine.StateMachine
 import javax.inject.Inject
 
 class ArticleStateMachine @Inject constructor(

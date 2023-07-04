@@ -6,7 +6,6 @@ import automate.openai.chatgpt.data.ChatGptResponse
 import automate.openai.chatgpt.data.Choice
 import automate.openai.chatgpt.data.InputParameter
 import automate.statemachine.InputMap
-import automate.statemachine.State
 import automate.statemachine.Transition
 import automate.statemachine.data.ModelFeedback
 import automate.statemachine.prompt.StateMachinePrompter
