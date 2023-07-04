@@ -87,6 +87,6 @@ suspend fun test() {
     }
 
     stateMachine.run {
-        it.values.first().execute(mutableMapOf())
+        it.values.first() to emptyMap()
     }
 }

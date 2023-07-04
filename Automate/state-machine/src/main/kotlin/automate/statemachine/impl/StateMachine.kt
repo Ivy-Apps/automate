@@ -25,7 +25,9 @@ class StateMachine(
     val data: Map<String, Any> = _data
 
     suspend fun run(
-        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> ExecutableTransition
+        nextTransition: suspend NextTransitionScope.(
+            availableTransitions: Map<String, Transition>
+        ) -> Pair<Transition, InputsMap>
     ): Completion {
         if (states.size >= maxSteps) {
             return Completion.MaxStepsReached(steps)
@@ -41,15 +43,15 @@ class StateMachine(
     }
 
     private suspend fun executeTransition(
-        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> ExecutableTransition
+        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> Pair<Transition, InputsMap>
     ): Completion {
         try {
             val scope = NextTransitionScopeImpl(
                 error = errors.lastOrNull(),
                 feedback = feedback
             )
-            val transition = nextTransition(scope, currentState.transitions)
-            val (nextStateName, feedback) = transition.execute()
+            val (transition, inputs) = nextTransition(scope, currentState.transitions)
+            val (nextStateName, feedback) = transition.prepare(inputs).execute()
             val nextState = states[nextStateName] ?: error("Invalid next state '$nextStateName'.")
             this.feedback = feedback
             _currentState = nextState

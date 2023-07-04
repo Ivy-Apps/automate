@@ -4,7 +4,7 @@ import automate.statemachine.InputScope
 import automate.statemachine.TransitionScope
 import automate.statemachine.data.Feedback
 
-typealias InputsMap = MutableMap<String, String>
+typealias InputsMap = Map<String, String>
 typealias TransitionFun = suspend (InputsMap) -> Pair<String, List<Feedback.Warning>>
 
 data class Transition(
@@ -12,7 +12,7 @@ data class Transition(
     val inputs: List<InputDef>,
     private val transitionFun: TransitionFun,
 ) {
-    fun execute(inputsMap: InputsMap): ExecutableTransition {
+    fun prepare(inputsMap: InputsMap): ExecutableTransition {
         return ExecutableTransition(
             name = name,
             inputsMap = inputsMap,
