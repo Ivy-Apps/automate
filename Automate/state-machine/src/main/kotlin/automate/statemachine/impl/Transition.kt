@@ -1,7 +1,6 @@
 package automate.statemachine.impl
 
 import automate.statemachine.InputScope
-import automate.statemachine.NonFatalFeedbackScope
 import automate.statemachine.TransitionScope
 import automate.statemachine.data.Feedback
 
@@ -48,14 +47,13 @@ class InputScopeImpl : InputScope {
 
 class TransitionScopeImpl(
     private val inputs: InputsMap
-) : TransitionScope, NonFatalFeedbackScope {
-    private val nonFatalFeedback: MutableList<Feedback.Warning> = mutableListOf()
+) : TransitionScope {
 
     override fun goTo(
         state: String,
-        suggestions: NonFatalFeedbackScope.() -> Unit
+        feedback: List<String>
     ): Pair<String, List<Feedback.Warning>> {
-        return state to nonFatalFeedback
+        return state to feedback.map(Feedback::Warning)
     }
 
     @Throws(Error::class)
@@ -65,10 +63,6 @@ class TransitionScopeImpl(
 
     override fun input(name: String): String {
         return inputs[name] ?: error("Missing input '$name'.")
-    }
-
-    override fun warning(feedback: String) {
-        nonFatalFeedback.add(Feedback.Warning(feedback))
     }
 
     data class Error(val error: String) : Exception()

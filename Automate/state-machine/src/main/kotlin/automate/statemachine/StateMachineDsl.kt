@@ -45,7 +45,7 @@ interface TransitionScope {
     @StateMachineDsl
     fun goTo(
         state: String,
-        suggestions: NonFatalFeedbackScope.() -> Unit = { }
+        feedback: List<String> = emptyList(),
     ): Pair<String, List<Warning>>
 
     @StateMachineDsl
@@ -53,11 +53,6 @@ interface TransitionScope {
 
     @StateMachineDsl
     fun input(name: String): String
-}
-
-interface NonFatalFeedbackScope {
-    @StateMachineDsl
-    fun warning(feedback: String)
 }
 
 suspend fun test() {
@@ -77,9 +72,7 @@ suspend fun test() {
                 val email = input("email")
                 val password = input("password")
                 data["auth-token"] = "ok"
-                goTo("main") {
-                    warning("Use stronger password.")
-                }
+                goTo("main", listOf("feedback"))
             }
 
             transition("register", {
