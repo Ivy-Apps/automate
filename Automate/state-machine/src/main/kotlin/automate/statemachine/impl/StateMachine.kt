@@ -12,6 +12,8 @@ class StateMachine(
     private val steps = mutableListOf<ExecutableTransition>()
     private val errors = mutableListOf<Feedback.Error>()
 
+    private var feedback = listOf<Feedback.Warning>()
+
     private var _currentState: State? = null
     val currentState: State
         get() = _currentState ?: error("No initial state.")
@@ -42,18 +44,25 @@ class StateMachine(
         nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> ExecutableTransition
     ): Completion {
         try {
-            val transition = nextTransition(NextTransitionScopeImpl(), currentState.transitions)
-            val (nextState, feedback) = transition.execute()
-            // TODO: Implement state transition and feedback!
+            val scope = NextTransitionScopeImpl(
+                error = errors.lastOrNull(),
+                feedback = feedback
+            )
+            val transition = nextTransition(scope, currentState.transitions)
+            val (nextStateName, feedback) = transition.execute()
+            val nextState = states[nextStateName] ?: error("Invalid next state '$nextStateName'.")
+            this.feedback = feedback
+            _currentState = nextState
         } catch (e: NextTransitionScopeImpl.Error) {
             errors.add(Feedback.Error(e.error))
         } catch (e: TransitionScopeImpl.Error) {
+            errors.add(Feedback.Error(e.error))
+        } catch (e: StateMachineError) {
             errors.add(Feedback.Error(e.error))
         }
 
         return run(nextTransition)
     }
-
 
     override fun initialState(name: String, block: StateScope.() -> Unit) {
         _currentState = createState(name, block).also {
@@ -78,7 +87,6 @@ class StateMachine(
         ).apply(block)
     }
 
-
     sealed interface Completion {
         data class Success(
             val data: Map<String, Any>,
@@ -95,7 +103,10 @@ class StateMachine(
     }
 }
 
-class NextTransitionScopeImpl : NextTransitionScope {
+class NextTransitionScopeImpl(
+    override val error: Feedback.Error?,
+    override val feedback: List<Feedback.Warning>,
+) : NextTransitionScope {
     @Throws(Error::class)
     override fun error(error: String): Nothing {
         throw Error(error)
@@ -105,6 +116,9 @@ class NextTransitionScopeImpl : NextTransitionScope {
 }
 
 interface NextTransitionScope {
+    val error: Feedback.Error?
+    val feedback: List<Feedback.Warning>
+
     @StateMachineDsl
     fun error(error: String): Nothing
 }
