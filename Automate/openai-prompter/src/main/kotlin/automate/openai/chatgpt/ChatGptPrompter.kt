@@ -7,7 +7,7 @@ import automate.openai.chatgpt.data.Choice
 import automate.openai.chatgpt.data.InputParameter
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
-import automate.statemachine.data.ModelFeedback
+import automate.statemachine.data.Feedback
 import automate.statemachine.prompt.StateMachinePrompter
 import kotlinx.serialization.json.Json
 
@@ -29,7 +29,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         state: S,
         data: A,
         options: List<Choice>,
-        feedback: List<ModelFeedback>,
+        feedback: List<Feedback>,
         choicesLeft: Int,
     ): String
 
@@ -37,11 +37,11 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
 
     override suspend fun prompt(
         state: S,
-        feedback: List<ModelFeedback>,
+        feedback: List<Feedback>,
         availableTransitions: List<Trans>,
         steps: Int,
         maxSteps: Int,
-    ): Either<ModelFeedback.Error, Pair<Trans, InputMap>> = catch({
+    ): Either<Feedback.Error, Pair<Trans, InputMap>> = catch({
         val prompt = currentStateAsJson(
             state = state,
             data = refineData(state),
@@ -75,7 +75,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     }) {
         it.printStackTrace()
         Either.Left(
-            ModelFeedback.Error(
+            Feedback.Error(
                 feedback = "$it"
             )
         )

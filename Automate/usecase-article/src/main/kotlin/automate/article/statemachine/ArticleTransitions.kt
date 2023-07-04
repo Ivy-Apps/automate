@@ -8,8 +8,8 @@ import automate.article.sectionsTitles
 import automate.statemachine.InputMap
 import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
-import automate.statemachine.data.ModelFeedback.Error
-import automate.statemachine.data.ModelFeedback.Suggestion
+import automate.statemachine.data.Feedback.Error
+import automate.statemachine.data.Feedback.Warning
 
 sealed class ArticleTransition : Transition<ArticleState, Article>()
 
@@ -33,7 +33,7 @@ object SetTitleTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Warning>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         ArticleState.WriteIntroduction(
             data = state.data.copy(title = title)
@@ -59,7 +59,7 @@ object WriteIntroduction : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Warning>>> = either {
         val introduction = requiredParam(input, PARAM_INTRODUCTION)
         ArticleState.WriteBody(
             data = state.data.copy(
@@ -98,7 +98,7 @@ object AddSectionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Warning>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
 
@@ -138,7 +138,7 @@ object WriteConclusionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<Error, Pair<ArticleState, List<Suggestion>>> = either {
+    ): Either<Error, Pair<ArticleState, List<Warning>>> = either {
         val conclusion = requiredParam(input, PARAM_CONCLUSION)
         ArticleState.Conclusion(
             state.data.copy(

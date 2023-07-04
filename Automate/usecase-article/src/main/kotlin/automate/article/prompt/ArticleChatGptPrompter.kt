@@ -14,7 +14,7 @@ import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.data.ChatGptResponse
 import automate.openai.chatgpt.data.Choice
 import automate.openai.normalizePrompt
-import automate.statemachine.data.ModelFeedback
+import automate.statemachine.data.Feedback
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -73,7 +73,7 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
         state: ArticleState,
         data: Article,
         options: List<Choice>,
-        feedback: List<ModelFeedback>,
+        feedback: List<Feedback>,
         choicesLeft: Int
     ): String {
         val result = StateGptOptimized(
@@ -85,9 +85,9 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
                     append('[')
                     append(
                         when (it) {
-                            is ModelFeedback.Error -> "ERROR"
-                            is ModelFeedback.FatalError -> "FATAL ERROR"
-                            is ModelFeedback.Suggestion -> "Suggestion"
+                            is Feedback.Error -> "ERROR"
+                            is Feedback.FatalError -> "FATAL ERROR"
+                            is Feedback.Warning -> "Suggestion"
                         }
                     )
                     append("] ")

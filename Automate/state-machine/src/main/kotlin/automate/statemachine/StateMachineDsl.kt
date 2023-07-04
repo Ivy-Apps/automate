@@ -1,18 +1,12 @@
 package automate.statemachine
 
-import automate.statemachine.data.ModelFeedback.Suggestion
+import automate.statemachine.data.Feedback.Warning
+import automate.statemachine.impl.StateMachine
 import java.time.LocalDateTime
 
 @DslMarker
 annotation class StateMachineDsl
 
-class State
-
-class StateMachine {
-    fun run() {
-
-    }
-}
 
 @StateMachineDsl
 fun stateMachine(block: StateMachineScope.() -> Unit): StateMachine {
@@ -20,6 +14,8 @@ fun stateMachine(block: StateMachineScope.() -> Unit): StateMachine {
 }
 
 interface StateMachineScope {
+    val data: MutableMap<String, Any>
+
     @StateMachineDsl
     fun initialState(name: String, block: StateScope.() -> Unit)
 
@@ -37,7 +33,7 @@ interface StateScope {
     fun transition(
         name: String,
         inputs: InputScope.() -> Unit = {},
-        transition: TransitionScope.() -> Pair<State, List<Suggestion>>
+        transition: TransitionScope.() -> Pair<String, List<Warning>>
     )
 }
 
@@ -50,8 +46,8 @@ interface TransitionScope {
     @StateMachineDsl
     fun goTo(
         state: String,
-        suggestions: SuggestionsScope.() -> Unit = { }
-    ): Pair<State, List<Suggestion>>
+        suggestions: NonFatalFeedbackScope.() -> Unit = { }
+    ): Pair<String, List<Warning>>
 
     @StateMachineDsl
     fun error(error: String): Nothing
@@ -60,12 +56,12 @@ interface TransitionScope {
     fun input(name: String): String
 }
 
-interface SuggestionsScope {
+interface NonFatalFeedbackScope {
     @StateMachineDsl
-    fun suggestion(feedback: String)
+    fun warning(feedback: String)
 }
 
-fun test() {
+suspend fun test() {
     val stateMachine = stateMachine {
         initialState("t&c") {
             transition("Agree") {
@@ -82,7 +78,7 @@ fun test() {
                 val email = input("email")
                 val password = input("password")
                 goTo("main") {
-                    suggestion("Use stronger password.")
+                    warning("Use stronger password.")
                 }
             }
 
@@ -97,5 +93,7 @@ fun test() {
         finalState("main")
     }
 
-    stateMachine.run()
+    stateMachine.run {
+        it.first().execute(mutableMapOf())
+    }
 }

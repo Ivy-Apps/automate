@@ -3,21 +3,21 @@ package automate.statemachine.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed interface ModelFeedback {
+sealed interface Feedback {
     val feedback: String
 
     @Serializable
     data class FatalError(
         override val feedback: String,
-    ) : ModelFeedback
+    ) : Feedback
 
     @Serializable
     data class Error(
         override val feedback: String,
-    ) : ModelFeedback
+    ) : Feedback
 
     @Serializable
-    data class Suggestion(
+    data class Warning(
         override val feedback: String
-    ) : ModelFeedback
+    ) : Feedback
 }
