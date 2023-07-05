@@ -13,8 +13,8 @@ class ChatGptPrompter @Inject constructor(
     private val api: ChatGptApi,
 ) {
     companion object {
-        fun startTag(name: String) = "`[${name.uppercase()}_START]`"
-        fun endTag(name: String) = "`[${name.uppercase()}_END]`"
+        fun startTag(name: String) = "[[${name.uppercase()}_START]]"
+        fun endTag(name: String) = "[[${name.uppercase()}_END]]"
     }
 
     @VisibleForTesting
@@ -58,15 +58,17 @@ ${endTag("Input B")}
 ${endTag("Option X")}
 6. If you make an invalid or a bad choice you'll receive an additional ${startTag("error")}
 with information what went wrong. You must adjust your next choice based on the information
-in the ${startTag("error")}.
+in the error.
 """.normalizePrompt()
+
+    private var firstPromptTrue = true
 
     suspend fun prompt(
         state: Map<String, Any>,
         transitions: NonEmptyList<Transition>,
+        lastError: StateMachineError?,
         firstPrompt: Boolean,
     ): Either<ChatGptApi.Error, String> {
-
         TODO()
     }
 

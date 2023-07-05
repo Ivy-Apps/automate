@@ -29,6 +29,7 @@ class ChatGptTranslatorTest : FreeSpec({
         val prePrompt = translator.prePrompt()
 
         // then
+        log("Pre-prompt: ${prePrompt.length} chars")
         log(prePrompt)
         prePrompt.shouldNotBeBlank()
     }
@@ -77,44 +78,45 @@ class ChatGptTranslatorTest : FreeSpec({
         )
 
         // then
+        log("State prompt: ${statePrompt.length} chars")
         log(statePrompt)
         statePrompt shouldBe """
-            `[GOAL_START]`
+            [[GOAL_START]]
             goal
-            `[GOAL_END]`
-            `[REQUIREMENTS_START]`
+            [[GOAL_END]]
+            [[REQUIREMENTS_START]]
             - a
             - b
             - c
-            `[REQUIREMENTS_END]`
-            `[BEHAVIOR_START]`
+            [[REQUIREMENTS_END]]
+            [[BEHAVIOR_START]]
             behavior
-            `[BEHAVIOR_END]`
-            `[STATE_START]`
+            [[BEHAVIOR_END]]
+            [[STATE_START]]
             a: A
             b: B
-            `[STATE_END]`
-            `[CHOICES_START]`
-            `[OPTION 1_START]`
+            [[STATE_END]]
+            [[CHOICES_START]]
+            [[OPTION 1_START]]
             trans_a
             Transition a
-            `[INPUT A_START]`
+            [[INPUT A_START]]
             Desc a
-            `[INPUT A_END]`
-            `[INPUT B_START]`
+            [[INPUT A_END]]
+            [[INPUT B_START]]
             Desc b
-            `[INPUT B_END]`
-            `[OPTION 1_END]`
-            `[OPTION 2_START]`
+            [[INPUT B_END]]
+            [[OPTION 1_END]]
+            [[OPTION 2_START]]
             b
-            `[INPUT VAR_START]`
+            [[INPUT VAR_START]]
             Desc var
-            `[INPUT VAR_END]`
-            `[OPTION 2_END]`
-            `[CHOICES_END]`
-            `[ERROR_START]`
+            [[INPUT VAR_END]]
+            [[OPTION 2_END]]
+            [[CHOICES_END]]
+            [[ERROR_START]]
             Error 1,2,3
-            `[ERROR_END]`
+            [[ERROR_END]]
         """.trimIndent()
     }
 })
