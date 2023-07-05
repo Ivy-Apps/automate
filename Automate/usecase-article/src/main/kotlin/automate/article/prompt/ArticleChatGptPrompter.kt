@@ -9,7 +9,6 @@ import automate.article.statemachine.SetTitleTransition
 import automate.di.AppScope
 import automate.di.SingleIn
 import automate.openai.chatgpt.ChatGptApi
-import automate.openai.chatgpt.ChatGptPrePrompter
 import automate.openai.chatgpt.ChatGptPrompter
 import automate.openai.chatgpt.data.ChatGptResponse
 import automate.openai.chatgpt.data.Choice
@@ -23,7 +22,7 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 class ArticleChatGptPrompter @Inject constructor(
     chatGptService: ChatGptApi,
-    chatGptPrePrompter: ChatGptPrePrompter,
+    chatGptPrePrompter: ChatGptPrompter,
 ) : ChatGptPrompter<Article, ArticleState, ArticleTransition>(
     chatGptService = chatGptService,
     chatGptPrePrompter = chatGptPrePrompter,
@@ -40,7 +39,7 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
 """.normalizePrompt()
     }
 
-    override fun example(): ChatGptPrePrompter.Example {
+    override fun example(): ChatGptPrompter.Example {
         val state = StateGptOptimized(
             article = Article(
                 topic = "HTTP requests in Android using Kotlin using Kotlin Flows and Ktor.",
@@ -63,7 +62,7 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
             )
         )
 
-        return ChatGptPrePrompter.Example(
+        return ChatGptPrompter.Example(
             userPrompt = Json.encodeToString(state),
             chatGptResponse = response,
         )

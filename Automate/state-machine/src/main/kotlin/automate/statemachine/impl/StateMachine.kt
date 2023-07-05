@@ -46,7 +46,9 @@ class StateMachine internal constructor(
     private suspend fun executeTransition(transitionProvider: TransitionProvider): Completion {
         try {
             val scope = NextTransitionProviderScopeImpl(
-                error = _errors.lastOrNull(),
+                data = data,
+                currentState = currentState,
+                lastError = _errors.lastOrNull(),
             )
             val (transition, inputs) = with(transitionProvider) {
                 scope.provideNextTransition(availableTransitions())
@@ -118,7 +120,9 @@ fun interface TransitionProvider {
 }
 
 class NextTransitionProviderScopeImpl(
-    override val error: StateMachineError?,
+    override val data: Map<String, Any>,
+    override val currentState: State,
+    override val lastError: StateMachineError?,
 ) : NextTransitionProviderScope {
     @Throws(Error::class)
     override fun error(error: String): Nothing {
@@ -129,7 +133,9 @@ class NextTransitionProviderScopeImpl(
 }
 
 interface NextTransitionProviderScope {
-    val error: StateMachineError?
+    val data: Map<String, Any>
+    val currentState: State
+    val lastError: StateMachineError?
 
     @StateMachineDsl
     fun error(error: String): Nothing
