@@ -3,6 +3,7 @@ package automate.openai.chatgpt
 import arrow.core.Either
 import arrow.core.NonEmptyList
 import automate.openai.normalizePrompt
+import automate.statemachine.data.StateMachineError
 import automate.statemachine.impl.Transition
 import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
@@ -73,6 +74,7 @@ in the ${startTag("error")}.
     fun statePrompt(
         state: Map<String, Any>,
         transitions: NonEmptyList<Transition>,
+        lastError: StateMachineError?,
     ): String = buildString {
         start("goal")
         append(agent.goal)
@@ -93,6 +95,12 @@ in the ${startTag("error")}.
         start("choices")
         options(transitions)
         end("choices")
+        if (lastError != null) {
+            append('\n')
+            start("error")
+            append(lastError.error)
+            end("error")
+        }
     }
 
     private fun List<String>.toBulletList(): String {

@@ -8,7 +8,6 @@ class ChatGptAgentRunner(
 ) {
     suspend fun run() {
         stateMachine.run { transitions ->
-
             TODO()
         }
     }

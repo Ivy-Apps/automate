@@ -13,3 +13,9 @@ fun transition(
     inputs = inputs,
     transitionFun = { error("") }
 )
+
+fun log(thing: String) {
+    println("----------------")
+    println(thing)
+    println("----------------")
+}

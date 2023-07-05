@@ -1,7 +1,9 @@
 package automate.openai.chatgpt
 
 import arrow.core.nonEmptyListOf
+import automate.openai.log
 import automate.openai.transition
+import automate.statemachine.data.StateMachineError
 import automate.statemachine.impl.InputDef
 import io.kotest.core.spec.style.FreeSpec
 import io.kotest.matchers.shouldBe
@@ -27,7 +29,7 @@ class ChatGptTranslatorTest : FreeSpec({
         val prePrompt = translator.prePrompt()
 
         // then
-        println(prePrompt)
+        log(prePrompt)
         prePrompt.shouldNotBeBlank()
     }
 
@@ -70,10 +72,12 @@ class ChatGptTranslatorTest : FreeSpec({
                         )
                     )
                 ),
-            )
+            ),
+            lastError = StateMachineError.TransitionProvider("Error 1,2,3")
         )
 
         // then
+        log(statePrompt)
         statePrompt shouldBe """
             `[GOAL_START]`
             goal
@@ -108,6 +112,9 @@ class ChatGptTranslatorTest : FreeSpec({
             `[INPUT VAR_END]`
             `[OPTION 2_END]`
             `[CHOICES_END]`
+            `[ERROR_START]`
+            Error 1,2,3
+            `[ERROR_END]`
         """.trimIndent()
     }
 })
