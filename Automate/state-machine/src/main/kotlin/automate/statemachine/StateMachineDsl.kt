@@ -38,6 +38,7 @@ interface StateScope {
     @StateMachineDsl
     fun transition(
         name: String,
+        description: String? = null,
         inputs: InputScope.() -> Unit = {},
         transition: TransitionScope.() -> NextState
     )
@@ -69,7 +70,7 @@ suspend fun test() {
         }
 
         state("onboarding") {
-            transition("login", {
+            transition("login", inputs = {
                 input("email", "An email of an existing user.")
                 input("password", "The password for that user.")
             }) {
@@ -79,7 +80,7 @@ suspend fun test() {
                 goTo("main")
             }
 
-            transition("register", {
+            transition("register", inputs = {
                 input("email", "dfdfd")
                 input("password", "fdsdsfsd")
             }) {

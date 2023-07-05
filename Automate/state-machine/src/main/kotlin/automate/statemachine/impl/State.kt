@@ -14,6 +14,7 @@ data class State(
 
     override fun transition(
         name: String,
+        description: String?,
         inputs: InputScope.() -> Unit,
         transition: TransitionScope.() -> NextState
     ) {
@@ -21,6 +22,7 @@ data class State(
         inputScope.inputs()
         _transitions[name] = Transition(
             name = name,
+            description = description,
             inputs = inputScope.inputs,
             transitionFun = { inputsMap ->
                 TransitionScopeImpl(inputsMap).transition()

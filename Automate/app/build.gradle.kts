@@ -31,7 +31,7 @@ dependencies {
 
     implementation(libs.bundles.logging)
 
-    testImplementation(libs.bundles.kotest)
+    testImplementation(libs.bundles.testing)
     testImplementation(kotlin("test"))
 }
 

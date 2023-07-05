@@ -11,6 +11,7 @@ typealias TransitionFun = suspend (InputsMap) -> NextState
 
 data class Transition(
     val name: String,
+    val description: String?,
     val inputs: List<InputDef>,
     private val transitionFun: TransitionFun,
 ) {
