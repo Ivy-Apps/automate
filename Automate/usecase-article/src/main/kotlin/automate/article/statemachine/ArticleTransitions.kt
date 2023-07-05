@@ -6,9 +6,8 @@ import automate.article.data.Article
 import automate.article.data.BodyItem
 import automate.article.sectionsTitles
 import automate.statemachine.InputMap
-import automate.statemachine.Transition
 import automate.statemachine.TransitionParam
-import automate.statemachine.data.StateMachineError.TransitionError
+import automate.statemachine.data.StateMachineError.Transition
 import automate.statemachine.data.StateMachineError.Warning
 
 sealed class ArticleTransition : Transition<ArticleState, Article>()
@@ -33,7 +32,7 @@ object SetTitleTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<TransitionError, Pair<ArticleState, List<Warning>>> = either {
+    ): Either<Transition, Pair<ArticleState, List<Warning>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         ArticleState.WriteIntroduction(
             data = state.data.copy(title = title)
@@ -59,7 +58,7 @@ object WriteIntroduction : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<TransitionError, Pair<ArticleState, List<Warning>>> = either {
+    ): Either<Transition, Pair<ArticleState, List<Warning>>> = either {
         val introduction = requiredParam(input, PARAM_INTRODUCTION)
         ArticleState.WriteBody(
             data = state.data.copy(
@@ -98,7 +97,7 @@ object AddSectionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<TransitionError, Pair<ArticleState, List<Warning>>> = either {
+    ): Either<Transition, Pair<ArticleState, List<Warning>>> = either {
         val title = requiredParam(input, PARAM_TITLE)
         val text = requiredParam(input, PARAM_TEXT)
 
@@ -109,7 +108,7 @@ object AddSectionTransition : ArticleTransition() {
         }
         if (duplicatedSection) {
             raise(
-                TransitionError("Section with a title '$title' already exists. Add a new unique section.")
+                Transition("Section with a title '$title' already exists. Add a new unique section.")
             )
         }
 
@@ -138,7 +137,7 @@ object WriteConclusionTransition : ArticleTransition() {
     override fun transition(
         state: ArticleState,
         input: InputMap
-    ): Either<TransitionError, Pair<ArticleState, List<Warning>>> = either {
+    ): Either<Transition, Pair<ArticleState, List<Warning>>> = either {
         val conclusion = requiredParam(input, PARAM_CONCLUSION)
         ArticleState.Conclusion(
             state.data.copy(

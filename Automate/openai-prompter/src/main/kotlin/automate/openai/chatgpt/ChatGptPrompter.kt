@@ -41,7 +41,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
         availableTransitions: List<Trans>,
         steps: Int,
         maxSteps: Int,
-    ): Either<StateMachineError.TransitionError, Pair<Trans, InputMap>> = catch({
+    ): Either<StateMachineError.Transition, Pair<Trans, InputMap>> = catch({
         val prompt = currentStateAsJson(
             state = state,
             data = refineData(state),
@@ -75,7 +75,7 @@ abstract class ChatGptPrompter<A : Any, S : State<A>, Trans : Transition<S, A>>(
     }) {
         it.printStackTrace()
         Either.Left(
-            StateMachineError.TransitionError(
+            StateMachineError.Transition(
                 error = "$it"
             )
         )

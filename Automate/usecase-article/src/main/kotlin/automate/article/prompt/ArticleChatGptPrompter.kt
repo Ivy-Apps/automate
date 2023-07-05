@@ -85,7 +85,7 @@ ${ArticleConstants.ARTICLE_REQUIREMENTS}
                     append('[')
                     append(
                         when (it) {
-                            is StateMachineError.TransitionError -> "ERROR"
+                            is StateMachineError.Transition -> "ERROR"
                             is StateMachineError.FatalError -> "FATAL ERROR"
                             is StateMachineError.Warning -> "Suggestion"
                         }

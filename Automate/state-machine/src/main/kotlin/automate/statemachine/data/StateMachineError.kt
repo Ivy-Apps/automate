@@ -7,12 +7,12 @@ sealed interface StateMachineError {
     val error: String
 
     @Serializable
-    data class TransitionProviderError(
+    data class TransitionProvider(
         override val error: String,
     ) : StateMachineError
 
     @Serializable
-    data class TransitionError(
+    data class Transition(
         override val error: String,
     ) : StateMachineError
 }

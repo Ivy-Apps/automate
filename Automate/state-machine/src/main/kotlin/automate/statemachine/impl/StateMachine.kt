@@ -30,14 +30,14 @@ class StateMachine internal constructor(
     suspend fun run(
         transitionProvider: TransitionProvider
     ): Completion {
-        if (states.size >= maxSteps) {
+        if (steps.size >= maxSteps) {
             return Completion.MaxStepsReached(_steps)
         }
         if (_errors.size >= maxErrors) {
             return Completion.MaxErrorsReached(_errors)
         }
         if (currentState.isFinal) {
-            return Completion.Success(data, _steps)
+            return Completion.FinalStateReached(data, _steps)
         }
 
         return executeTransition(transitionProvider)
@@ -59,9 +59,9 @@ class StateMachine internal constructor(
             _steps.add(executableTransition)
             _currentState = nextState
         } catch (e: NextTransitionProviderScopeImpl.Error) {
-            _errors.add(StateMachineError.TransitionProviderError(e.error))
+            _errors.add(StateMachineError.TransitionProvider(e.error))
         } catch (e: TransitionScopeImpl.Error) {
-            _errors.add(StateMachineError.TransitionError(e.error))
+            _errors.add(StateMachineError.Transition(e.error))
         }
         return run(transitionProvider)
     }
@@ -95,7 +95,7 @@ class StateMachine internal constructor(
     }
 
     sealed interface Completion {
-        data class Success(
+        data class FinalStateReached(
             val data: Map<String, Any>,
             val steps: List<ExecutableTransition>
         ) : Completion
