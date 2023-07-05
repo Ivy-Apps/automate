@@ -2,10 +2,12 @@ package automate.statemachine.impl
 
 import automate.statemachine.InputScope
 import automate.statemachine.TransitionScope
-import automate.statemachine.data.Feedback
+
+@JvmInline
+value class NextState(val state: String)
 
 typealias InputsMap = Map<String, String>
-typealias TransitionFun = suspend (InputsMap) -> Pair<String, List<Feedback.Warning>>
+typealias TransitionFun = suspend (InputsMap) -> NextState
 
 data class Transition(
     val name: String,
@@ -26,7 +28,7 @@ data class ExecutableTransition(
     private val inputsMap: InputsMap,
     private val transitionFun: TransitionFun,
 ) {
-    suspend fun execute(): Pair<String, List<Feedback.Warning>> {
+    suspend fun execute(): NextState {
         return transitionFun(inputsMap)
     }
 }
@@ -49,11 +51,8 @@ class TransitionScopeImpl(
     private val inputs: InputsMap
 ) : TransitionScope {
 
-    override fun goTo(
-        state: String,
-        feedback: List<String>
-    ): Pair<String, List<Feedback.Warning>> {
-        return state to feedback.map(Feedback::Warning)
+    override fun goTo(state: String): NextState {
+        return NextState(state)
     }
 
     @Throws(Error::class)

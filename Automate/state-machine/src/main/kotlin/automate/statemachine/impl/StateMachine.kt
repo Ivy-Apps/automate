@@ -3,16 +3,17 @@ package automate.statemachine.impl
 import automate.statemachine.StateMachineDsl
 import automate.statemachine.StateMachineScope
 import automate.statemachine.StateScope
-import automate.statemachine.data.Feedback
+import automate.statemachine.data.StateMachineError
 
-class StateMachine(
+class StateMachine internal constructor(
     private val maxSteps: Int,
     private val maxErrors: Int,
 ) : StateMachineScope {
-    private val steps = mutableListOf<ExecutableTransition>()
-    private val errors = mutableListOf<Feedback.Error>()
+    private val _steps = mutableListOf<ExecutableTransition>()
+    val steps: List<ExecutableTransition> = _steps
 
-    private var feedback = listOf<Feedback.Warning>()
+    private val _errors = mutableListOf<StateMachineError>()
+    val errors: List<StateMachineError> = _errors
 
     private var _currentState: State? = null
     val currentState: State
@@ -30,13 +31,13 @@ class StateMachine(
         ) -> Pair<Transition, InputsMap>
     ): Completion {
         if (states.size >= maxSteps) {
-            return Completion.MaxStepsReached(steps)
+            return Completion.MaxStepsReached(_steps)
         }
-        if (errors.size >= maxErrors) {
-            return Completion.MaxErrorsReached(errors)
+        if (_errors.size >= maxErrors) {
+            return Completion.MaxErrorsReached(_errors)
         }
         if (currentState.isFinal) {
-            return Completion.Success(data, steps)
+            return Completion.Success(data, _steps)
         }
 
         return executeTransition(nextTransition)
@@ -47,24 +48,21 @@ class StateMachine(
     ): Completion {
         try {
             val scope = NextTransitionScopeImpl(
-                error = errors.lastOrNull(),
-                feedback = feedback
+                error = _errors.lastOrNull(),
             )
             val (transition, inputs) = nextTransition(scope, currentState.transitions)
-            val (nextStateName, feedback) = transition.prepare(inputs)
-                .also { steps.add(it) }
-                .execute()
-            val nextState = states[nextStateName] ?: error("Invalid next state '$nextStateName'.")
-            this.feedback = feedback
+            val executableTransition = transition.prepare(inputs)
+            val nextStateName = executableTransition.execute().state
+            val nextState = states[nextStateName] ?: throw TransitionScopeImpl.Error(
+                "Invalid next state '$nextStateName'."
+            )
+            _steps.add(executableTransition)
             _currentState = nextState
         } catch (e: NextTransitionScopeImpl.Error) {
-            errors.add(Feedback.Error(e.error))
+            _errors.add(StateMachineError.LogicError(e.error))
         } catch (e: TransitionScopeImpl.Error) {
-            errors.add(Feedback.Error(e.error))
-        } catch (e: StateMachineError) {
-            errors.add(Feedback.Error(e.error))
+            _errors.add(StateMachineError.TransitionError(e.error))
         }
-
         return run(nextTransition)
     }
 
@@ -97,19 +95,19 @@ class StateMachine(
             val steps: List<ExecutableTransition>
         ) : Completion
 
-        data class MaxErrorsReached(val errors: List<Feedback.Error>) : Completion
+        data class MaxErrorsReached(val errors: List<StateMachineError>) : Completion
+
         data class MaxStepsReached(val steps: List<ExecutableTransition>) : Completion
     }
 
-    @Throws(StateMachineError::class)
+    @Throws(StateMachineBuilderException::class)
     private fun error(error: String): Nothing {
-        throw StateMachineError(error)
+        throw StateMachineBuilderException(error)
     }
 }
 
 class NextTransitionScopeImpl(
-    override val error: Feedback.Error?,
-    override val feedback: List<Feedback.Warning>,
+    override val error: StateMachineError?,
 ) : NextTransitionScope {
     @Throws(Error::class)
     override fun error(error: String): Nothing {
@@ -120,11 +118,10 @@ class NextTransitionScopeImpl(
 }
 
 interface NextTransitionScope {
-    val error: Feedback.Error?
-    val feedback: List<Feedback.Warning>
+    val error: StateMachineError?
 
     @StateMachineDsl
     fun error(error: String): Nothing
 }
 
-data class StateMachineError(val error: String) : Exception(error)
+data class StateMachineBuilderException(val error: String) : Exception(error)

@@ -1,6 +1,6 @@
 package automate.statemachine
 
-import automate.statemachine.data.Feedback.Warning
+import automate.statemachine.impl.NextState
 import automate.statemachine.impl.StateMachine
 import java.time.LocalDateTime
 
@@ -9,8 +9,15 @@ annotation class StateMachineDsl
 
 
 @StateMachineDsl
-fun stateMachine(block: StateMachineScope.() -> Unit): StateMachine {
-    TODO()
+fun stateMachine(
+    maxSteps: Int = 30,
+    maxErrors: Int = 10,
+    block: StateMachineScope.() -> Unit
+): StateMachine {
+    return StateMachine(
+        maxSteps = maxSteps,
+        maxErrors = maxErrors,
+    ).also(block)
 }
 
 interface StateMachineScope {
@@ -32,7 +39,7 @@ interface StateScope {
     fun transition(
         name: String,
         inputs: InputScope.() -> Unit = {},
-        transition: TransitionScope.() -> Pair<String, List<Warning>>
+        transition: TransitionScope.() -> NextState
     )
 }
 
@@ -43,10 +50,7 @@ interface InputScope {
 
 interface TransitionScope {
     @StateMachineDsl
-    fun goTo(
-        state: String,
-        feedback: List<String> = emptyList(),
-    ): Pair<String, List<Warning>>
+    fun goTo(state: String): NextState
 
     @StateMachineDsl
     fun error(error: String): Nothing
@@ -72,7 +76,7 @@ suspend fun test() {
                 val email = input("email")
                 val password = input("password")
                 data["auth-token"] = "ok"
-                goTo("main", listOf("feedback"))
+                goTo("main")
             }
 
             transition("register", {
