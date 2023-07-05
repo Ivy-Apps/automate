@@ -1,5 +1,7 @@
 package automate.statemachine.impl
 
+import arrow.core.NonEmptySet
+import arrow.core.toNonEmptySetOrNull
 import automate.statemachine.StateMachineDsl
 import automate.statemachine.StateMachineScope
 import automate.statemachine.StateScope
@@ -26,9 +28,7 @@ class StateMachine internal constructor(
     val data: Map<String, Any> = _data
 
     suspend fun run(
-        nextTransition: suspend NextTransitionScope.(
-            availableTransitions: Map<String, Transition>
-        ) -> Pair<Transition, InputsMap>
+        transitionProvider: TransitionProvider
     ): Completion {
         if (states.size >= maxSteps) {
             return Completion.MaxStepsReached(_steps)
@@ -40,17 +40,17 @@ class StateMachine internal constructor(
             return Completion.Success(data, _steps)
         }
 
-        return executeTransition(nextTransition)
+        return executeTransition(transitionProvider)
     }
 
-    private suspend fun executeTransition(
-        nextTransition: suspend NextTransitionScope.(Map<String, Transition>) -> Pair<Transition, InputsMap>
-    ): Completion {
+    private suspend fun executeTransition(transitionProvider: TransitionProvider): Completion {
         try {
-            val scope = NextTransitionScopeImpl(
+            val scope = NextTransitionProviderScopeImpl(
                 error = _errors.lastOrNull(),
             )
-            val (transition, inputs) = nextTransition(scope, currentState.transitions)
+            val (transition, inputs) = with(transitionProvider) {
+                scope.provideNextTransition(availableTransitions())
+            }
             val executableTransition = transition.prepare(inputs)
             val nextStateName = executableTransition.execute().state
             val nextState = states[nextStateName] ?: throw TransitionScopeImpl.Error(
@@ -58,12 +58,17 @@ class StateMachine internal constructor(
             )
             _steps.add(executableTransition)
             _currentState = nextState
-        } catch (e: NextTransitionScopeImpl.Error) {
-            _errors.add(StateMachineError.LogicError(e.error))
+        } catch (e: NextTransitionProviderScopeImpl.Error) {
+            _errors.add(StateMachineError.TransitionProviderError(e.error))
         } catch (e: TransitionScopeImpl.Error) {
             _errors.add(StateMachineError.TransitionError(e.error))
         }
-        return run(nextTransition)
+        return run(transitionProvider)
+    }
+
+    private fun availableTransitions(): NonEmptySet<Transition> {
+        return currentState.transitions.values.toNonEmptySetOrNull()
+            ?: error("State '${currentState.name}' doesn't have defined transitions.")
     }
 
     override fun initialState(name: String, block: StateScope.() -> Unit) {
@@ -106,9 +111,15 @@ class StateMachine internal constructor(
     }
 }
 
-class NextTransitionScopeImpl(
+fun interface TransitionProvider {
+    suspend fun NextTransitionProviderScope.provideNextTransition(
+        availableTransitions: NonEmptySet<Transition>
+    ): Pair<Transition, InputsMap>
+}
+
+class NextTransitionProviderScopeImpl(
     override val error: StateMachineError?,
-) : NextTransitionScope {
+) : NextTransitionProviderScope {
     @Throws(Error::class)
     override fun error(error: String): Nothing {
         throw Error(error)
@@ -117,7 +128,7 @@ class NextTransitionScopeImpl(
     data class Error(val error: String) : Exception()
 }
 
-interface NextTransitionScope {
+interface NextTransitionProviderScope {
     val error: StateMachineError?
 
     @StateMachineDsl

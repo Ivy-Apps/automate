@@ -3,7 +3,6 @@ package automate.statemachine.impl
 import automate.statemachine.InputScope
 import automate.statemachine.StateScope
 import automate.statemachine.TransitionScope
-import automate.statemachine.data.StateMachineError
 
 data class State(
     val name: String,
@@ -16,7 +15,7 @@ data class State(
     override fun transition(
         name: String,
         inputs: InputScope.() -> Unit,
-        transition: TransitionScope.() -> Pair<String, List<automate.statemachine.data.Feedback.StateMachineError.Warning>>
+        transition: TransitionScope.() -> NextState
     ) {
         val inputScope = InputScopeImpl()
         inputScope.inputs()

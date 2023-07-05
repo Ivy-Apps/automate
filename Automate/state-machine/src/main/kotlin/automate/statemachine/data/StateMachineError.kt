@@ -7,7 +7,7 @@ sealed interface StateMachineError {
     val error: String
 
     @Serializable
-    data class LogicError(
+    data class TransitionProviderError(
         override val error: String,
     ) : StateMachineError
 
