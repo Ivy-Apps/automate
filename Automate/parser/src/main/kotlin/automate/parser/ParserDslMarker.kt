@@ -25,4 +25,7 @@ interface ParserDslScope {
 
     @ParserDslMarker
     fun consumeWhitespace()
+
+    @ParserDslMarker
+    fun move(n: Int)
 }

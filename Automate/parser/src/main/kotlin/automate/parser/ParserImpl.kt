@@ -42,4 +42,8 @@ class ParserImpl(
             consume()
         }
     }
+
+    override fun move(n: Int) {
+        position += n
+    }
 }

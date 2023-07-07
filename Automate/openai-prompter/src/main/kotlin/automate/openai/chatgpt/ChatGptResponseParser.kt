@@ -37,6 +37,10 @@ class ChatGptResponseParser @Inject constructor() {
                 "Invalid option index: $optionIndex. Choose an option between [1, ${transitions.size}]."
             }
 
+            val inputStart = "${OPEN_TAG_START}INPUT"
+            consumeUntil(inputStart, dropEndTag = true)
+            move(-inputStart.length)
+
             val inputs = buildList {
                 while (true) {
                     consumeWhitespace()
