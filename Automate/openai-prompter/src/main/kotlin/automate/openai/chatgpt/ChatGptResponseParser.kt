@@ -1,6 +1,7 @@
 package automate.openai.chatgpt
 
 import arrow.core.Either
+import arrow.core.NonEmptyList
 import arrow.core.raise.either
 import arrow.core.raise.ensureNotNull
 import automate.openai.chatgpt.ChatGptPrompter.Companion.OPEN_TAG_END
@@ -25,7 +26,7 @@ class ChatGptResponseParser @Inject constructor() {
      * <</OPTION 1>>
      */
     fun parse(
-        transitions: List<Transition>,
+        transitions: NonEmptyList<Transition>,
         chatGptResponse: String
     ): Either<String, Pair<Transition, InputsMap>> = either {
         parse(chatGptResponse) {

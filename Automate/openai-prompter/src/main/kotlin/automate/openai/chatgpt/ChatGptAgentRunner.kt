@@ -1,14 +1,15 @@
 package automate.openai.chatgpt
 
 import automate.statemachine.impl.StateMachine
+import javax.inject.Inject
 
-class ChatGptAgentRunner(
+class ChatGptAgentRunner @Inject constructor(
     private val stateMachine: StateMachine,
     private val prompter: ChatGptPrompter
 ) {
     suspend fun run() {
         stateMachine.run { transitions ->
-            TODO()
+            prompter.prompt(this, transitions)
         }
     }
 }

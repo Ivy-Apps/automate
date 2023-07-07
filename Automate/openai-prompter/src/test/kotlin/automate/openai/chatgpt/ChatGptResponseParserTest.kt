@@ -1,5 +1,6 @@
 package automate.openai.chatgpt
 
+import arrow.core.nonEmptyListOf
 import automate.openai.transition
 import io.kotest.assertions.arrow.core.shouldBeRight
 import io.kotest.core.spec.style.FreeSpec
@@ -22,7 +23,7 @@ class ChatGptResponseParserTest : FreeSpec({
         // when
         val option1 = transition(name = "Option 1")
         val res = parser.parse(
-            transitions = listOf(
+            transitions = nonEmptyListOf(
                 option1,
                 transition(name = "Option 2")
             ),

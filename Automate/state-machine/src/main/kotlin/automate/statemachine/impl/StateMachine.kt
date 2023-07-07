@@ -1,7 +1,7 @@
 package automate.statemachine.impl
 
-import arrow.core.NonEmptySet
-import arrow.core.toNonEmptySetOrNull
+import arrow.core.NonEmptyList
+import arrow.core.toNonEmptyListOrNull
 import automate.statemachine.StateMachineDsl
 import automate.statemachine.StateMachineScope
 import automate.statemachine.StateScope
@@ -68,8 +68,8 @@ class StateMachine internal constructor(
         return run(transitionProvider)
     }
 
-    private fun availableTransitions(): NonEmptySet<Transition> {
-        return currentState.transitions.values.toNonEmptySetOrNull()
+    private fun availableTransitions(): NonEmptyList<Transition> {
+        return currentState.transitions.values.toNonEmptyListOrNull()
             ?: error("State '${currentState.name}' doesn't have defined transitions.")
     }
 
@@ -115,7 +115,7 @@ class StateMachine internal constructor(
 
 fun interface TransitionProvider {
     suspend fun NextTransitionProviderScope.provideNextTransition(
-        availableTransitions: NonEmptySet<Transition>
+        availableTransitions: NonEmptyList<Transition>
     ): Pair<Transition, InputsMap>
 }
 

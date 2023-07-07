@@ -15,7 +15,7 @@ import javax.inject.Inject
 class ChatGptPrompter @Inject constructor(
     private val agent: ChatGptAgent,
     private val api: ChatGptApi,
-    private val chatGptResponseParser: ChatGptResponseParser
+    private val responseParser: ChatGptResponseParser
 ) {
     companion object {
         const val OPEN_TAG_START = "<<"
@@ -29,7 +29,7 @@ class ChatGptPrompter @Inject constructor(
     }
 
     @VisibleForTesting
-    fun prePrompt(): String = """
+    internal fun prePrompt(): String = """
 You are a pattern-following assistant that lives in a state-machine to achieve the following goal:
 "${agent.goal}"
 
@@ -71,9 +71,10 @@ in the error.
     private val _messages: MutableList<Message> = mutableListOf()
     private val messages = _messages
 
-    suspend fun NextTransitionProviderScope.prompt(
+    suspend fun prompt(
+        scope: NextTransitionProviderScope,
         transitions: NonEmptyList<Transition>,
-    ): Pair<Transition, InputsMap> {
+    ): Pair<Transition, InputsMap> = with(scope) {
         val prompt = statePrompt(data, transitions, lastError)
         val conversation = buildList {
             add(
@@ -109,11 +110,14 @@ in the error.
             is Either.Right -> res.value
         }
 
-        TODO()
+        when (val res = responseParser.parse(transitions, chatGptResponse)) {
+            is Either.Left -> error("ParseError: $res")
+            is Either.Right -> res.value
+        }
     }
 
     @VisibleForTesting
-    fun statePrompt(
+    internal fun statePrompt(
         state: Map<String, Any>,
         transitions: NonEmptyList<Transition>,
         lastError: StateMachineError?,
