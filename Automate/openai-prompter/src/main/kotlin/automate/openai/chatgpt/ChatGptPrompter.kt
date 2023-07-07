@@ -13,30 +13,26 @@ class ChatGptPrompter @Inject constructor(
     private val api: ChatGptApi,
 ) {
     companion object {
-        fun startTag(name: String) = "[[${name.uppercase()}_START]]"
-        fun endTag(name: String) = "[[${name.uppercase()}_END]]"
+        fun startTag(name: String) = "<<${name.uppercase()}>>"
+        fun endTag(name: String) = "<</${name.uppercase()}>>"
     }
 
     @VisibleForTesting
     fun prePrompt(): String = """
-You are a pattern-following assistant that lives in a state-machine
-to achieve the following goal: "${agent.goal}" by completing the task.
+You are a pattern-following assistant that lives in a state-machine to achieve the following goal:
+"${agent.goal}"
+
 The task requirements are:
-${agent.requirements.toBulletList()}
+${agent.requirements.toNumbersList()}
 
 You're role is '${agent.behavior}' and must role-play this behavior.
 
-You must only respond with in this format:
-- Sections start with ${startTag("sectionName")} and ends with ${endTag("sectionName")}.
+You must only respond in the following format that resembles XML:
+- Sections start with ${startTag("section")} and end with ${endTag("section")} tags.
 - On each message you'll receive:
 1. ${startTag("state")}: The state of the task
-2. ${startTag("choices")} with ${startTag("option 1")}, 
-${startTag("option 2")}, ${startTag("option N")} inside them.
-3. Each ${startTag("option X")} has zero or many "Inputs".
-- You must respond by inspecting ${startTag("state")} and responding with
-the best ${startTag("option X")} providing the proper string inputs
-to complete the task and achieve the goal.
-4. An option inside ${startTag("choices")} looks like this:
+2. ${startTag("choices")} with ${startTag("option 1")}, ${startTag("option 2")}, ${startTag("option N")} inside them.
+3. An option inside ${startTag("choices")} looks like this and has zero or many inputs.
 ${startTag("Option 1")}
 A description of the option and what it does.
 ${startTag("Input A")}
@@ -46,7 +42,7 @@ ${startTag("Input B")}
 Lorem ipsum
 ${endTag("Input B")}
 ${endTag("Option 1")}
-5. After analyzing the ${startTag("state")} and choosing the best option you
+4. After analyzing the ${startTag("state")} and choosing the best option you
 must respond with:
 ${startTag("Option X")}
 ${startTag("Input A")}
@@ -56,7 +52,7 @@ ${startTag("Input B")}
 Value for "b"
 ${endTag("Input B")}
 ${endTag("Option X")}
-6. If you make an invalid or a bad choice you'll receive an additional ${startTag("error")}
+5. If you make an invalid or a bad choice you'll receive an additional ${startTag("error")}
 with information what went wrong. You must adjust your next choice based on the information
 in the error.
 """.normalizePrompt()
@@ -83,7 +79,7 @@ in the error.
         end("goal")
         append('\n')
         start("requirements")
-        append(agent.requirements.toBulletList())
+        append(agent.requirements.toNumbersList())
         end("requirements")
         append('\n')
         start("behavior")
@@ -105,8 +101,16 @@ in the error.
         }
     }
 
-    private fun List<String>.toBulletList(): String {
-        return "- ${joinToString("\n- ")}"
+    private fun List<String>.toNumbersList(): String {
+        val list = this
+        return buildString {
+            list.forEachIndexed { index, requirement ->
+                append("${index + 1}. $requirement")
+                if (index + 1 < list.size) {
+                    append('\n')
+                }
+            }
+        }
     }
 
     private fun StringBuilder.state(state: Map<String, Any>) {
@@ -132,9 +136,11 @@ in the error.
 
     private fun StringBuilder.option(index: Int, transition: Transition) {
         start("Option ${index + 1}")
+        append('"')
         append(transition.name)
+        append('"')
         if (transition.description != null) {
-            append("\n")
+            append(": ")
             append(transition.description)
         }
         for (input in transition.inputs) {

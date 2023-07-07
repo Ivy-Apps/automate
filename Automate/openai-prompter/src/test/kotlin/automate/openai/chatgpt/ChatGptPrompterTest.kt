@@ -10,7 +10,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldNotBeBlank
 import io.mockk.mockk
 
-class ChatGptTranslatorTest : FreeSpec({
+class ChatGptPrompterTest : FreeSpec({
     "pre-prompting" {
         // given
         val agent = ChatGptAgent(
@@ -81,42 +81,41 @@ class ChatGptTranslatorTest : FreeSpec({
         log("State prompt: ${statePrompt.length} chars")
         log(statePrompt)
         statePrompt shouldBe """
-            [[GOAL_START]]
+            <<GOAL>>
             goal
-            [[GOAL_END]]
-            [[REQUIREMENTS_START]]
-            - a
-            - b
-            - c
-            [[REQUIREMENTS_END]]
-            [[BEHAVIOR_START]]
+            <</GOAL>>
+            <<REQUIREMENTS>>
+            1. a
+            2. b
+            3. c
+            <</REQUIREMENTS>>
+            <<BEHAVIOR>>
             behavior
-            [[BEHAVIOR_END]]
-            [[STATE_START]]
+            <</BEHAVIOR>>
+            <<STATE>>
             a: A
             b: B
-            [[STATE_END]]
-            [[CHOICES_START]]
-            [[OPTION 1_START]]
-            trans_a
-            Transition a
-            [[INPUT A_START]]
+            <</STATE>>
+            <<CHOICES>>
+            <<OPTION 1>>
+            "trans_a": Transition a
+            <<INPUT A>>
             Desc a
-            [[INPUT A_END]]
-            [[INPUT B_START]]
+            <</INPUT A>>
+            <<INPUT B>>
             Desc b
-            [[INPUT B_END]]
-            [[OPTION 1_END]]
-            [[OPTION 2_START]]
-            b
-            [[INPUT VAR_START]]
+            <</INPUT B>>
+            <</OPTION 1>>
+            <<OPTION 2>>
+            "b"
+            <<INPUT VAR>>
             Desc var
-            [[INPUT VAR_END]]
-            [[OPTION 2_END]]
-            [[CHOICES_END]]
-            [[ERROR_START]]
+            <</INPUT VAR>>
+            <</OPTION 2>>
+            <</CHOICES>>
+            <<ERROR>>
             Error 1,2,3
-            [[ERROR_END]]
+            <</ERROR>>
         """.trimIndent()
     }
 })
