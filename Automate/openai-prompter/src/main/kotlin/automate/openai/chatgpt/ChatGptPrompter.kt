@@ -9,12 +9,9 @@ import automate.statemachine.data.StateMachineError
 import automate.statemachine.impl.InputsMap
 import automate.statemachine.impl.NextTransitionProviderScope
 import automate.statemachine.impl.Transition
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import org.jetbrains.annotations.VisibleForTesting
 
-class ChatGptPrompter @AssistedInject constructor(
-    @Assisted
+class ChatGptPrompter(
     private val params: ChatGptParams,
     private val api: ChatGptApi,
     private val responseParser: ChatGptResponseParser

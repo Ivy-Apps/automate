@@ -1,14 +1,28 @@
 package automate.openai.chatgpt.di
 
 import automate.openai.chatgpt.ChatGptAgent
+import automate.openai.chatgpt.ChatGptApi
+import automate.openai.chatgpt.ChatGptPrompter
+import automate.openai.chatgpt.ChatGptResponseParser
 import automate.openai.chatgpt.data.ChatGptParams
 import automate.statemachine.impl.StateMachine
-import dagger.assisted.AssistedFactory
+import javax.inject.Inject
 
-@AssistedFactory
-interface ChatGptAgentFactory {
+class ChatGptAgentFactory @Inject constructor(
+    private val api: ChatGptApi,
+    private val responseParser: ChatGptResponseParser,
+) {
     fun create(
         params: ChatGptParams,
         stateMachine: StateMachine,
-    ): ChatGptAgent
+    ): ChatGptAgent {
+        return ChatGptAgent(
+            stateMachine = stateMachine,
+            prompter = ChatGptPrompter(
+                params = params,
+                api = api,
+                responseParser = responseParser,
+            )
+        )
+    }
 }

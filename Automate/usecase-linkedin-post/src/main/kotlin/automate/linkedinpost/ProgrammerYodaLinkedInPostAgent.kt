@@ -2,10 +2,10 @@ package automate.linkedinpost
 
 import arrow.core.NonEmptyList
 import arrow.core.nonEmptyListOf
-import automate.AppCoroutineScope
 import automate.openai.chatgpt.data.ChatGptParams
 import automate.openai.chatgpt.di.ChatGptAgentFactory
 import automate.statemachine.stateMachine
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -13,9 +13,9 @@ import javax.inject.Inject
 
 class ProgrammerYodaLinkedInPostAgent @Inject constructor(
     private val agentFactory: ChatGptAgentFactory,
-    @AppCoroutineScope
-    private val appCoroutineScope: CoroutineScope,
 ) {
+    private val coroutineScope = CoroutineScope(CoroutineName("Scope"))
+
     companion object {
         const val HOOK = "hook"
         const val OUTLINE = "outline"
@@ -38,7 +38,7 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
             ),
             stateMachine = stateMachine
         )
-        appCoroutineScope.launch {
+        coroutineScope.launch {
             agent.dataFlow.collectLatest { data ->
                 println("------------------")
                 println(data)
