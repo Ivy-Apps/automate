@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":openai-api"))
     implementation(project(":openai-prompter"))
     implementation(project(":state-machine"))
-    implementation(project(":usecase-article"))
+    implementation(project(":usecase-linkedin-post"))
 
     implementation(libs.bundles.arrow)
     implementation(libs.bundles.ktor)

@@ -1,54 +1,26 @@
 package automate
 
-import automate.article.data.BodyItem
-import automate.article.sectionsTitles
-import automate.article.statemachine.ArticleStateMachine
-import automate.article.wordsCount
-import automate.domain.article.ArticleProducer
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collectLatest
+import arrow.core.nonEmptyListOf
+import automate.linkedinpost.ProgrammerYodaLinkedInPostAgent
 import javax.inject.Inject
 
 class AutomateApp @Inject constructor(
-    private val stateMachine: ArticleStateMachine,
-    private val articleProducer: ArticleProducer
+    private val programmerYodaLinkedInPostAgent: ProgrammerYodaLinkedInPostAgent
 ) {
-    private val scope = CoroutineScope(CoroutineName("AutomateApp"))
-
-    private var iteration = 0
 
     suspend fun run() {
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                stateMachine.state.collectLatest { state ->
-                    val article = state.data
-                    val body = article.body
-                    val sections = body.count { it is BodyItem.Section }
-                    val articleWords = article.wordsCount()
-                    logger.debug(
-                        """
-    
-------------------------------------------------------
-Iteration #${iteration++}: 
-Title: "${article.title}"
-Introduction: ${article.introduction.wordsCount()} words.
-Sections:
--${article.sectionsTitles().joinToString(separator = "\n-")}
-$sections sections | ${stateMachine.activeErrors()} active errors | ${stateMachine.errorsOccurred} total errors
-Article length: $articleWords words.
-""".trimIndent()
-                    )
-                }
-            }
-        }
-        stateMachine.run()
-        println("Result: ---------------------")
-        val article = stateMachine.state.value.data
-        println(articleProducer.toMarkdown(article))
-        println("--------------------------")
+        val post = programmerYodaLinkedInPostAgent.producePost(
+            topic = "Teaching all core concepts in programming.",
+            requirements = nonEmptyListOf(
+                "Do it in a fun and wise way.",
+                "Teach the core concepts like variables, types, branching, functions.",
+                "Teach all the concepts that makes programming possible.",
+            )
+        )
 
-        articleProducer.saveInFile(article)
-        println("Feedback:")
-        println(stateMachine.feedback)
+        println()
+        println()
+        println("--------------------")
+        println(post)
     }
 }

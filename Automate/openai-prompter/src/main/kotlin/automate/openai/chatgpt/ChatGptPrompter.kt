@@ -2,18 +2,20 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
-import automate.openai.chatgpt.data.ChatGptAgent
 import automate.openai.chatgpt.data.ChatGptAgentError
+import automate.openai.chatgpt.data.ChatGptParams
 import automate.openai.normalizePrompt
 import automate.statemachine.data.StateMachineError
 import automate.statemachine.impl.InputsMap
 import automate.statemachine.impl.NextTransitionProviderScope
 import automate.statemachine.impl.Transition
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import org.jetbrains.annotations.VisibleForTesting
-import javax.inject.Inject
 
-class ChatGptPrompter @Inject constructor(
-    private val agent: ChatGptAgent,
+class ChatGptPrompter @AssistedInject constructor(
+    @Assisted
+    private val params: ChatGptParams,
     private val api: ChatGptApi,
     private val responseParser: ChatGptResponseParser
 ) {
@@ -31,12 +33,12 @@ class ChatGptPrompter @Inject constructor(
     @VisibleForTesting
     internal fun prePrompt(): String = """
 You are a pattern-following assistant that lives in a state-machine to achieve the following goal:
-"${agent.goal}"
+"${params.goal}"
 
 The task requirements are:
-${agent.requirements.toNumbersList()}
+${params.requirements.toNumbersList()}
 
-You're role is '${agent.behavior}' and must role-play this behavior.
+You're role is '${params.behavior}' and must role-play this behavior.
 
 You must only respond in the following format that resembles XML:
 - Sections start with ${openTag("section")} and end with ${closeTag("section")} tags.
@@ -123,15 +125,15 @@ in the error.
         lastError: StateMachineError?,
     ): String = buildString {
         start("goal")
-        append(agent.goal)
+        append(params.goal)
         end("goal")
         append('\n')
         start("requirements")
-        append(agent.requirements.toNumbersList())
+        append(params.requirements.toNumbersList())
         end("requirements")
         append('\n')
         start("behavior")
-        append(agent.behavior)
+        append(params.behavior)
         end("behavior")
         append('\n')
         start("state")
