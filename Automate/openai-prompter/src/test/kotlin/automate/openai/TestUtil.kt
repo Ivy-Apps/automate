@@ -4,7 +4,7 @@ import automate.statemachine.impl.InputDef
 import automate.statemachine.impl.Transition
 
 fun transition(
-    name: String,
+    name: String = "transition",
     description: String? = null,
     inputs: List<InputDef> = emptyList(),
 ) = Transition(

@@ -1,6 +1,7 @@
 package automate.openai.chatgpt
 
 import arrow.core.nonEmptyListOf
+import automate.openai.chatgpt.data.ChatGptAgent
 import automate.openai.log
 import automate.openai.transition
 import automate.statemachine.data.StateMachineError
@@ -23,7 +24,7 @@ class ChatGptPrompterTest : FreeSpec({
             ),
             behavior = "Grandmaster Yoda from Star Wars who also invented computer programming"
         )
-        val translator = ChatGptPrompter(agent, mockk())
+        val translator = ChatGptPrompter(agent, mockk(), ChatGptResponseParser())
 
         // when
         val prePrompt = translator.prePrompt()
@@ -41,7 +42,7 @@ class ChatGptPrompterTest : FreeSpec({
             requirements = nonEmptyListOf("a", "b", "c"),
             behavior = "behavior"
         )
-        val translator = ChatGptPrompter(agent, mockk())
+        val translator = ChatGptPrompter(agent, mockk(), ChatGptResponseParser())
 
         // when
         val statePrompt = translator.statePrompt(

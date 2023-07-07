@@ -10,10 +10,6 @@ repositories {
 
 dependencies {
     implementation(project(":common"))
-    implementation(project(":openai-api"))
-    implementation(project(":state-machine"))
-    implementation(project(":parser"))
-
 
     implementation(libs.bundles.arrow)
     implementation(libs.bundles.ktor)

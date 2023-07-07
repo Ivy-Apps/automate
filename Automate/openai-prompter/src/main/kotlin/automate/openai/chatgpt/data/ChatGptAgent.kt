@@ -1,4 +1,4 @@
-package automate.openai.chatgpt
+package automate.openai.chatgpt.data
 
 import arrow.core.NonEmptyList
 

@@ -2,6 +2,8 @@ package automate.openai.chatgpt
 
 import arrow.core.Either
 import arrow.core.NonEmptyList
+import automate.openai.chatgpt.data.ChatGptAgent
+import automate.openai.chatgpt.data.ChatGptAgentError
 import automate.openai.normalizePrompt
 import automate.statemachine.data.StateMachineError
 import automate.statemachine.impl.InputsMap
@@ -16,8 +18,14 @@ class ChatGptPrompter @Inject constructor(
     private val chatGptResponseParser: ChatGptResponseParser
 ) {
     companion object {
-        fun startTag(name: String) = "<<${name.uppercase()}>>"
-        fun endTag(name: String) = "<</${name.uppercase()}>>"
+        const val OPEN_TAG_START = "<<"
+        const val OPEN_TAG_END = ">>"
+
+        const val CLOSE_TAG_START = "<</"
+        const val CLOSE_TAG_END = ">>"
+
+        fun openTag(name: String) = "$OPEN_TAG_START${name.uppercase()}$OPEN_TAG_END"
+        fun closeTag(name: String) = "$CLOSE_TAG_START${name.uppercase()}$CLOSE_TAG_END"
     }
 
     @VisibleForTesting
@@ -31,31 +39,31 @@ ${agent.requirements.toNumbersList()}
 You're role is '${agent.behavior}' and must role-play this behavior.
 
 You must only respond in the following format that resembles XML:
-- Sections start with ${startTag("section")} and end with ${endTag("section")} tags.
+- Sections start with ${openTag("section")} and end with ${closeTag("section")} tags.
 - On each message you'll receive:
-1. ${startTag("state")}: The state of the task
-2. ${startTag("choices")} with ${startTag("option 1")}, ${startTag("option 2")}, ${startTag("option N")} inside them.
-3. An option inside ${startTag("choices")} looks like this and has zero or many inputs.
-${startTag("Option 1")}
+1. ${openTag("state")}: The state of the task
+2. ${openTag("choices")} with ${openTag("option 1")}, ${openTag("option 2")}, ${openTag("option N")} inside them.
+3. An option inside ${openTag("choices")} looks like this and has zero or many inputs.
+${openTag("Option 1")}
 A description of the option and what it does.
-${startTag("Input A")}
+${openTag("Input A")}
 A variable named "a" that does...
-${endTag("Input A")}
-${startTag("Input B")}
+${closeTag("Input A")}
+${openTag("Input B")}
 Lorem ipsum
-${endTag("Input B")}
-${endTag("Option 1")}
-4. After analyzing the ${startTag("state")} and choosing the best option you
+${closeTag("Input B")}
+${closeTag("Option 1")}
+4. After analyzing the ${openTag("state")} and choosing the best option you
 must respond with:
-${startTag("Option X")}
-${startTag("Input A")}
+${openTag("Option X")}
+${openTag("Input A")}
 This is a start of the value of the variable "a"
-${endTag("Input A")}
-${startTag("Input B")}
+${closeTag("Input A")}
+${openTag("Input B")}
 Value for "b"
-${endTag("Input B")}
-${endTag("Option X")}
-5. If you make an invalid or a bad choice you'll receive an additional ${startTag("error")}
+${closeTag("Input B")}
+${closeTag("Option X")}
+5. If you make an invalid or a bad choice you'll receive an additional ${openTag("error")}
 with information what went wrong. You must adjust your next choice based on the information
 in the error.
 """.normalizePrompt()
@@ -101,12 +109,7 @@ in the error.
             is Either.Right -> res.value
         }
 
-        return with(chatGptResponseParser) {
-            parse(
-                transitions = transitions,
-                chatGptResponse = chatGptResponse,
-            )
-        }
+        TODO()
     }
 
     @VisibleForTesting
@@ -194,13 +197,13 @@ in the error.
     }
 
     private fun StringBuilder.start(tag: String) {
-        append(startTag(tag))
+        append(openTag(tag))
         append('\n')
     }
 
     private fun StringBuilder.end(tag: String) {
         append('\n')
-        append(endTag(tag))
+        append(closeTag(tag))
     }
 
     data class Message(

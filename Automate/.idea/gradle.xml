@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/openai-api" />
             <option value="$PROJECT_DIR$/openai-prompter" />
+            <option value="$PROJECT_DIR$/parser" />
             <option value="$PROJECT_DIR$/state-machine" />
             <option value="$PROJECT_DIR$/usecase-article" />
           </set>

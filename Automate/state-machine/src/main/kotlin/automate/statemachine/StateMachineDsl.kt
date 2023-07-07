@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 @DslMarker
 annotation class StateMachineDsl
 
-
 @StateMachineDsl
 fun stateMachine(
     maxSteps: Int = 30,
