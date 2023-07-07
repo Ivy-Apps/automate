@@ -2,7 +2,6 @@ package automate.statemachine
 
 import automate.statemachine.impl.NextState
 import automate.statemachine.impl.StateMachine
-import java.time.LocalDateTime
 
 @DslMarker
 annotation class StateMachineDsl
@@ -57,41 +56,4 @@ interface TransitionScope {
 
     @StateMachineDsl
     fun input(name: String): String
-}
-
-suspend fun test() {
-    val stateMachine = stateMachine {
-        initialState("t&c") {
-            transition("Agree") {
-                data["agreement date"] = LocalDateTime.now()
-                goTo("onboarding")
-            }
-        }
-
-        state("onboarding") {
-            transition("login", inputs = {
-                input("email", "An email of an existing user.")
-                input("password", "The password for that user.")
-            }) {
-                val email = input("email")
-                val password = input("password")
-                data["auth-token"] = "ok"
-                goTo("main")
-            }
-
-            transition("register", inputs = {
-                input("email", "dfdfd")
-                input("password", "fdsdsfsd")
-            }) {
-                goTo("main")
-            }
-        }
-
-        finalState("main")
-    }
-
-    stateMachine.run { transitions ->
-        val transition = transitions.first()
-        transition to emptyMap()
-    }
 }

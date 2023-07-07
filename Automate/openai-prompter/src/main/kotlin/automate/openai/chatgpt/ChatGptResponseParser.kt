@@ -79,7 +79,7 @@ class ChatGptResponseParser @Inject constructor() {
                 dropEndTag = true
             )?.trim()
             ensureNotNull(inputValue) {}
-            inputName to inputValue
+            inputName.uppercase() to inputValue
         }
 
 

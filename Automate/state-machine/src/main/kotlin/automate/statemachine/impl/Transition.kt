@@ -44,7 +44,7 @@ class InputScopeImpl : InputScope {
     val inputs: List<InputDef> = _inputs
 
     override fun input(name: String, description: String) {
-        _inputs.add(InputDef(name = name, description = description))
+        _inputs.add(InputDef(name = name.uppercase(), description = description))
     }
 }
 
@@ -62,7 +62,7 @@ class TransitionScopeImpl(
     }
 
     override fun input(name: String): String {
-        return inputs[name] ?: error("Missing input '$name'.")
+        return inputs[name.uppercase()] ?: error("Missing input '${name.uppercase()}'.")
     }
 
     data class Error(val error: String) : Exception()

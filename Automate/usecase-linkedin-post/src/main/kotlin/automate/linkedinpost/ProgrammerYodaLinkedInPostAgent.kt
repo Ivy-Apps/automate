@@ -59,19 +59,19 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
 
     private val stateMachine = stateMachine(
         maxSteps = 30,
-        maxErrors = 10,
+        maxErrors = 2,
     ) {
         initialState("hook") {
             transition(
                 name = "Hook",
                 description = "Write an engaging first words on the topic.",
                 inputs = {
-                    input(HOOK, "Engage the audience like Yoda. Max 50 chars.")
+                    input(HOOK, "Engage the audience like Yoda. Max 60 chars.")
                 }
             ) {
                 val hook = input(HOOK)
-                if (hook.length > 50) {
-                    error("The hook must be 50 characters or less.")
+                if (hook.length > 60) {
+                    error("The '${HOOK.uppercase()}' input must be 60 characters or less.")
                 }
                 data[HOOK] = hook
                 goTo("improve-hook")
