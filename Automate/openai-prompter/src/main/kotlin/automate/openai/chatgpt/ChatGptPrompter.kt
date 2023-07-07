@@ -4,6 +4,8 @@ import arrow.core.Either
 import arrow.core.NonEmptyList
 import automate.openai.normalizePrompt
 import automate.statemachine.data.StateMachineError
+import automate.statemachine.impl.InputsMap
+import automate.statemachine.impl.NextTransitionProviderScope
 import automate.statemachine.impl.Transition
 import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
@@ -11,6 +13,7 @@ import javax.inject.Inject
 class ChatGptPrompter @Inject constructor(
     private val agent: ChatGptAgent,
     private val api: ChatGptApi,
+    private val chatGptResponseParser: ChatGptResponseParser
 ) {
     companion object {
         fun startTag(name: String) = "<<${name.uppercase()}>>"
@@ -57,15 +60,53 @@ with information what went wrong. You must adjust your next choice based on the 
 in the error.
 """.normalizePrompt()
 
-    private var firstPromptTrue = true
+    private val _messages: MutableList<Message> = mutableListOf()
+    private val messages = _messages
 
-    suspend fun prompt(
-        state: Map<String, Any>,
+    suspend fun NextTransitionProviderScope.prompt(
         transitions: NonEmptyList<Transition>,
-        lastError: StateMachineError?,
-        firstPrompt: Boolean,
-    ): Either<ChatGptApi.Error, String> {
-        TODO()
+    ): Pair<Transition, InputsMap> {
+        val prompt = statePrompt(data, transitions, lastError)
+        val conversation = buildList {
+            add(
+                ChatGptMessage(
+                    role = ChatGptRole.System,
+                    content = prePrompt(),
+                )
+            )
+
+            messages.lastOrNull()?.let {
+                add(ChatGptMessage(role = ChatGptRole.User, content = it.prompt))
+                add(ChatGptMessage(role = ChatGptRole.Assistant, content = it.chatGptResponse))
+            }
+
+            add(
+                ChatGptMessage(
+                    role = ChatGptRole.User,
+                    content = prompt
+                )
+            )
+        }
+
+        val chatGptResponse = when (val res = api.prompt(conversation)) {
+            is Either.Left -> {
+                when (val chatGptError = res.value) {
+                    is ChatGptApi.Error.Generic -> error(chatGptError.error)
+                    ChatGptApi.Error.ServiceUnavailable -> {
+                        throw ChatGptAgentError("ChatGPT service unavailable. Multiple 5xx errors.")
+                    }
+                }
+            }
+
+            is Either.Right -> res.value
+        }
+
+        return with(chatGptResponseParser) {
+            parse(
+                transitions = transitions,
+                chatGptResponse = chatGptResponse,
+            )
+        }
     }
 
     @VisibleForTesting
@@ -161,4 +202,9 @@ in the error.
         append('\n')
         append(endTag(tag))
     }
+
+    data class Message(
+        val prompt: String,
+        val chatGptResponse: String,
+    )
 }

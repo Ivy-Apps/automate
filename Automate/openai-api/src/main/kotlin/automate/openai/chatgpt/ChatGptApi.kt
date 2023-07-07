@@ -66,6 +66,10 @@ class ChatGptApi @Inject constructor(
 
     sealed interface Error {
         object ServiceUnavailable : Error
-        data class Generic(val error: String) : Error
+        data class Generic(val error: String) : Error {
+            override fun toString(): String {
+                return "ChatGPT API error: $error."
+            }
+        }
     }
 }
