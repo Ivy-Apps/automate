@@ -5,10 +5,8 @@ import arrow.core.nonEmptyListOf
 import automate.openai.chatgpt.data.ChatGptParams
 import automate.openai.chatgpt.di.ChatGptAgentFactory
 import automate.statemachine.stateMachine
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ProgrammerYodaLinkedInPostAgent @Inject constructor(
@@ -39,11 +37,13 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
             stateMachine = stateMachine
         )
         coroutineScope.launch {
-            agent.dataFlow.collectLatest { data ->
-                println("------------------")
-                println(data)
-                println("------------------")
-                println()
+            withContext(Dispatchers.IO) {
+                agent.dataFlow.collectLatest { data ->
+                    println("------------------")
+                    println(data)
+                    println("------------------")
+                    println()
+                }
             }
         }
         println("Completion: ${agent.run()}")
@@ -59,20 +59,20 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
 
     private val stateMachine = stateMachine(
         maxSteps = 30,
-        maxErrors = 2,
+        maxErrors = 10,
     ) {
         initialState("hook") {
             transition(
                 name = "Hook",
                 description = "Write an engaging first words on the topic.",
                 inputs = {
-                    input(HOOK, "Engage the audience like Yoda. Max 60 chars.")
+                    input(HOOK, "Engage the audience like Yoda. Be short.")
                 }
             ) {
                 val hook = input(HOOK)
-                if (hook.length > 60) {
-                    error("The '${HOOK.uppercase()}' input must be 60 characters or less.")
-                }
+//                if (hook.length > 60) {
+//                    error("The '${HOOK.uppercase()}' input must be 60 characters or less.")
+//                }
                 data[HOOK] = hook
                 goTo("improve-hook")
             }
@@ -83,7 +83,7 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
                 name = "Edit hook",
                 description = "Make the hook more fun. Make it sound more like Yoda.",
                 inputs = {
-                    input(HOOK, "More engaging and fun hook.")
+                    input(HOOK, "Shorter and fun hook.")
                 }
             ) {
                 data["hook"] = input(HOOK)
@@ -94,7 +94,7 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
         state("outline") {
             transition(
                 name = "outline",
-                description = "List 5-7 points to be made in the post.",
+                description = "List the core points to be made in the post.",
                 inputs = {
                     input(OUTLINE, "The core points of the post")
                 }
@@ -132,6 +132,22 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
                 }
             ) {
                 data["post-body"] = input(POST_BODY)
+                goTo("edit-2")
+            }
+        }
+
+        state("edit-2") {
+            transition(
+                name = "edit-2",
+                description = "Make the post shorter and more fun.",
+                inputs = {
+                    input(
+                        POST_BODY,
+                        "Shorter post body with better information and jokes."
+                    )
+                }
+            ) {
+                data[POST_BODY] = input(POST_BODY)
                 goTo("finalize")
             }
         }
@@ -164,9 +180,6 @@ class ProgrammerYodaLinkedInPostAgent @Inject constructor(
                 }
             ) {
                 val hook = input(HOOK)
-                if (hook.length > 60) {
-                    error("The final hook must be 60 characters or less.")
-                }
                 data[HOOK] = hook
                 data[POST_BODY] = input(POST_BODY)
                 data[HASHTAGS] = input(HASHTAGS)

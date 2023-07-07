@@ -121,6 +121,12 @@ in the error.
         transitions: NonEmptyList<Transition>,
         lastError: StateMachineError?,
     ): String = buildString {
+        if (lastError != null) {
+            append('\n')
+            start("error")
+            append(lastError.error)
+            end("error")
+        }
         start("goal")
         append(params.goal)
         end("goal")
@@ -140,12 +146,6 @@ in the error.
         start("choices")
         options(transitions)
         end("choices")
-        if (lastError != null) {
-            append('\n')
-            start("error")
-            append(lastError.error)
-            end("error")
-        }
     }
 
     private fun List<String>.toNumbersList(): String {
